@@ -99,7 +99,23 @@ func (s *Server) OAuthCallback(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) OAuthLogout(w http.ResponseWriter, r *http.Request) {
-	// TODO: later
+	session := s.getDID(r)
+	if session.DID != nil {
+		if err := s.OAuth.Logout(r.Context(), *session.DID, session.SessionID); err != nil {
+			slog.Error("logout failed", "did", session.DID, "err", err)
+		}
+	}
+
+	sess, _ := s.CookieStore.Get(r, "oauth-session")
+	sess.Values = make(map[any]any)
+	err := sess.Save(r, w)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	slog.Info("logged out", "did", session.DID)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func (s *Server) ClientMetadata(w http.ResponseWriter, r *http.Request) {
