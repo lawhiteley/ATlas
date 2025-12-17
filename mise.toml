@@ -7,7 +7,7 @@ deps = "bun install"
 
 build-css = "bunx tailwindcss -c tailwind.config.js -i ./assets/input.css -o ./static/css/output.css --watch"
 
-build-templ = "templ generate --watch --proxy='http://localhost:3000' --cmd='go run .'"
+build-templ = "go tool templ generate --watch --proxy='http://localhost:3000' --cmd='go run .'"
 
 [tasks.dev]
 description = "Runs a dev server"
@@ -18,7 +18,7 @@ run = [
 [tasks.build]
 description = "Cut a build"
 run = [
-    "templ generate",
+    "go tool templ generate",
     "bunx tailwindcss -i ./assets/input.css -o ./static/css/output.css --minify",
     "go build -o ./bin/app ."
 ]
