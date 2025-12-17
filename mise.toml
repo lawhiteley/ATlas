@@ -14,6 +14,7 @@ description = "Runs a dev server"
 run = [
     { tasks = ["build-css", "build-templ"] }
 ]
+raw = true
 
 [tasks.build]
 description = "Cut a build"

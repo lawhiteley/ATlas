@@ -1,16 +1,133 @@
 package handlers
 
-import "net/http"
+import (
+	"encoding/json"
+	"fmt"
+	"log/slog"
+	"net/http"
+	"os"
+	"strings"
 
-func OAuthCallback(w http.ResponseWriter, r *http.Request) {}
+	"github.com/bluesky-social/indigo/atproto/auth/oauth"
+	"github.com/bluesky-social/indigo/atproto/identity"
+	"github.com/gorilla/sessions"
+)
 
-func ClientMetadata(w http.ResponseWriter, r *http.Request) {}
+func (s *Server) OAuthLogin(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	os.Stdout.WriteString("DIRECT: Handler called\n")
+	slog.Info("login hello")
 
-func JWKS(w http.ResponseWriter, r *http.Request) {}
+	// TODO: forward requests without username to bsky login site
 
-func OAuthLogin(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		// TODO: thing
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, fmt.Errorf("failed to parse form: %w", err).Error(), http.StatusBadRequest)
+		return
+	}
+
+	username, _ := strings.CutPrefix(r.PostFormValue("username"), "@")
+	slog.Info("login", "client_id", s.OAuth.Config.ClientID, "callback_url", s.OAuth.Config.CallbackURL)
+
+	redirectURL, err := s.OAuth.StartAuthFlow(ctx, username)
+
+	if err != nil {
+		var oauthErr = fmt.Errorf("OAuth failure: %w", err).Error()
+		slog.Error(oauthErr)
+		return
+	}
+
+	http.Redirect(w, r, redirectURL, http.StatusFound)
 }
 
-func OAuthLogout(w http.ResponseWriter, r *http.Request) {
+func (s *Server) OAuthCallback(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	params := r.URL.Query()
+	slog.Info("callback", "params", params)
 
+	data, err := s.OAuth.ProcessCallback(ctx, r.URL.Query())
+	if err != nil {
+		var callbackErr = fmt.Errorf("failed to process callback: %w", err).Error()
+		slog.Error(callbackErr)
+		return
+	}
+
+	session, err := s.OAuth.ResumeSession(ctx, data.AccountDID, data.SessionID)
+	if err != nil {
+		http.Error(w, "not authenticated", http.StatusUnauthorized)
+		return
+	}
+	c := session.APIClient()
+	var resp struct {
+		Handle string `json:"handle"`
+		// TODO: take more from response?
+	}
+	if err := c.Get(ctx, "com.atproto.server.getSession", nil, &resp); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	cookie, _ := s.CookieStore.Get(r, "oauth-session")
+	cookie.Values["account_did"] = data.AccountDID.String()
+	cookie.Values["session_id"] = data.SessionID
+	cookie.Values["handle"] = resp.Handle
+	if err := cookie.Save(r, w); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	slog.Info("login success", "did", data.AccountDID.String())
+	http.Redirect(w, r, "/", http.StatusFound)
+}
+
+func (s *Server) OAuthLogout(w http.ResponseWriter, r *http.Request) {
+	// TODO: later
+}
+
+func (s *Server) ClientMetadata(w http.ResponseWriter, r *http.Request) {
+	slog.Info("client metadata request", "url", r.URL, "host", r.Host)
+
+	meta := s.OAuth.Config.ClientMetadata()
+	if s.OAuth.Config.IsConfidential() {
+		meta.JWKSURI = strPtr(fmt.Sprintf("https://%s/oauth/jwks.json", r.Host))
+	}
+	meta.ClientName = strPtr("indigo atp-oauth-demo")
+	meta.ClientURI = strPtr(fmt.Sprintf("https://%s", r.Host))
+
+	// internal consistency check
+	if err := meta.Validate(s.OAuth.Config.ClientID); err != nil {
+		slog.Error("validating client metadata", "err", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(meta); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+// TODO: remove?
+func strPtr(raw string) *string {
+	return &raw
+}
+
+func (s *Server) JWKS(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	body := s.OAuth.Config.PublicJWKS()
+	if err := json.NewEncoder(w).Encode(body); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+type Server struct {
+	CookieStore *sessions.CookieStore
+	Dir         identity.Directory
+	OAuth       *oauth.ClientApp
 }

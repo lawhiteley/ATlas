@@ -29,7 +29,7 @@ func Panel(authenticated bool, avatar string, handle string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<fieldset class=\"fieldset\"><p class=\"label\"></p><form action=\"/auth/bluesky\" method=\"get\"><button class=\"btn btn-primary w-full\"><i class=\"ri-bluesky-fill\"></i>Log in with Bluesky</button></form><div class=\"divider\">Or via the ATmosphere</div><form class=\"join\" action=\"/auth/atproto\" method=\"get\"><input type=\"text\" class=\"input join-item\" name=\"did\" placeholder=\"@alice.example.com\"> <button class=\"btn btn-primary btn-outline join-item\" value=\"Login\">Go</button></form></fieldset>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<fieldset class=\"fieldset\"><p class=\"label\"></p><form action=\"/auth/login\" method=\"post\"><button class=\"btn btn-primary w-full\"><i class=\"ri-bluesky-fill\"></i>Log in with Bluesky</button></form><div class=\"divider\">Or via the ATmosphere</div><form class=\"join\" action=\"/auth/login\" method=\"post\"><input type=\"text\" class=\"input join-item\" name=\"username\" placeholder=\"@alice.example.com\"> <button class=\"btn btn-primary btn-outline join-item\" value=\"Login\">Go</button></form></fieldset>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
