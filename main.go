@@ -1,7 +1,6 @@
 package main
 
 import (
-	"ATlas/components"
 	"ATlas/db"
 	"ATlas/handlers"
 	"context"
@@ -60,7 +59,7 @@ func initializeServer(cctx context.Context, cmd *cli.Command) error {
 	// TODO: add confidential client support for deploy
 	config := oauth.NewLocalhostConfig(
 		fmt.Sprintf("http://127.0.0.1%s/auth/callback", bind),
-		[]string{"atproto", "repo:app.bsky.feed.post?action=create"}, // TODO: switch out for pin lexicon later
+		[]string{"atproto", "rpc:app.bsky.actor.getProfile?aud=did:web:api.bsky.app%23bsky_appview"}, // TODO: switch out for pin lexicon later
 	)
 
 	store, _ := db.NewSQLiteStore(&db.SQLiteConfig{
@@ -77,7 +76,8 @@ func initializeServer(cctx context.Context, cmd *cli.Command) error {
 		OAuth:       oauthClient,
 	}
 
-	registerAppRoute(mux)
+	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	registerAppRoutes(mux, &srv)
 	registerAuthRoutes(mux, &srv)
 
 	if err := http.ListenAndServe(bind, mux); err != nil {
@@ -88,13 +88,9 @@ func initializeServer(cctx context.Context, cmd *cli.Command) error {
 	return nil
 }
 
-func registerAppRoute(mux *http.ServeMux) {
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		index := components.Page("Luke", components.Atlas(), components.Panel(false, "law.png", "Luke"))
+func registerAppRoutes(mux *http.ServeMux, s *handlers.Server) {
+	mux.HandleFunc("GET /", s.Globe)
 
-		index.Render(r.Context(), w)
-	})
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 }
 
 func registerAuthRoutes(mux *http.ServeMux, s *handlers.Server) {

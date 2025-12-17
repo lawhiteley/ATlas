@@ -1,15 +1,61 @@
 package components
 
-templ Panel(authenticated bool, avatar string, handle string) {
-    <fieldset class="fieldset" >
-    <p class="label"></p>
-    <form action="/auth/login" method="post">
-        <button class="btn btn-primary w-full"><i class="ri-bluesky-fill" />Log in with Bluesky</button>
-    </form>
-    <div class="divider">Or via the ATmosphere</div>
-        <form class="join" action="/auth/login" method="post">
-        <input type="text" class="input join-item" name="username" placeholder="@alice.example.com" />
-        <button class="btn btn-primary btn-outline join-item" value="Login">Go</button>
-        </form>
-    </fieldset>
+import "ATlas/models"
+
+templ Panel(authenticated bool, user models.Session) {
+    <div class="panel-container fixed left-4 z-50 m-5 bg-base-200/90 backdrop-blur-sm border-base-300 rounded-box w-xs border p-3 shadow-xl">
+        <div class="mb-3 pb-2 border-b border-base-300">
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent text-center">
+                ATlas
+            </h1>
+        </div>
+        
+        if authenticated {
+            <div class="flex items-center gap-3">
+                <div class="avatar">
+                    <div class="w-12 rounded-full">
+                        <img loading="lazy" src={ user.Avatar } class="object-cover" />
+                    </div>
+                </div>
+                
+                <div class="flex-1 min-w-0">
+                    <div class="font-semibold text-base truncate">
+                        { user.Name }
+                    </div>
+                    <div class="text-sm text-base-content/60 truncate">
+                        { user.Handle }
+                    </div>
+                </div>
+
+                <a href="/auth/logout" class="btn btn-sm btn-circle flex-shrink-0" title="Log out">
+                    <i class="ri-logout-box-r-line text-lg"></i>
+                </a>
+            </div>
+        } else {
+            <div class="space-y-3">
+                <form action="/auth/login" method="post">
+                    <button class="btn btn-primary w-full gap-2">
+                        <i class="ri-bluesky-fill"></i>
+                        Log in with Bluesky
+                    </button>
+                </form>
+                
+                <div class="divider text-xs">
+                    or via the ATmosphere
+                </div>
+                
+                <form class="join w-full" action="/auth/login" method="post">
+                    <input 
+                        type="text" 
+                        class="input input-sm join-item flex-1" 
+                        name="username" 
+                        placeholder="@alice.example.com" 
+                    />
+                    <button class="btn btn-primary btn-sm join-item" type="submit">
+                        Go
+                    </button>
+                </form>
+            </div>
+        }
+    </div>
 }

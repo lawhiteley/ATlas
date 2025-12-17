@@ -8,7 +8,9 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func Panel(authenticated bool, avatar string, handle string) templ.Component {
+import "ATlas/models"
+
+func Panel(authenticated bool, user models.Session) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -29,7 +31,61 @@ func Panel(authenticated bool, avatar string, handle string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<fieldset class=\"fieldset\"><p class=\"label\"></p><form action=\"/auth/login\" method=\"post\"><button class=\"btn btn-primary w-full\"><i class=\"ri-bluesky-fill\"></i>Log in with Bluesky</button></form><div class=\"divider\">Or via the ATmosphere</div><form class=\"join\" action=\"/auth/login\" method=\"post\"><input type=\"text\" class=\"input join-item\" name=\"username\" placeholder=\"@alice.example.com\"> <button class=\"btn btn-primary btn-outline join-item\" value=\"Login\">Go</button></form></fieldset>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"panel-container fixed left-4 z-50 m-5 bg-base-200/90 backdrop-blur-sm border-base-300 rounded-box w-xs border p-3 shadow-xl\"><div class=\"mb-3 pb-2 border-b border-base-300\"><h1 class=\"text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent text-center\">ATlas</h1></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if authenticated {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"flex items-center gap-3\"><div class=\"avatar\"><div class=\"w-12 rounded-full\"><img loading=\"lazy\" src=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var2 string
+			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(user.Avatar)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/panel.templ`, Line: 17, Col: 61}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" class=\"object-cover\"></div></div><div class=\"flex-1 min-w-0\"><div class=\"font-semibold text-base truncate\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(user.Name)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/panel.templ`, Line: 23, Col: 35}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div><div class=\"text-sm text-base-content/60 truncate\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var4 string
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(user.Handle)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/panel.templ`, Line: 26, Col: 37}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div></div><a href=\"/auth/logout\" class=\"btn btn-sm btn-circle flex-shrink-0\" title=\"Log out\"><i class=\"ri-logout-box-r-line text-lg\"></i></a></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"space-y-3\"><form action=\"/auth/login\" method=\"post\"><button class=\"btn btn-primary w-full gap-2\"><i class=\"ri-bluesky-fill\"></i> Log in with Bluesky</button></form><div class=\"divider text-xs\">or via the ATmosphere</div><form class=\"join w-full\" action=\"/auth/login\" method=\"post\"><input type=\"text\" class=\"input input-sm join-item flex-1\" name=\"username\" placeholder=\"@alice.example.com\"> <button class=\"btn btn-primary btn-sm join-item\" type=\"submit\">Go</button></form></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

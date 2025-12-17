@@ -62,19 +62,33 @@ func (s *Server) OAuthCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	c := session.APIClient()
-	var resp struct {
+
+	var getSession struct {
 		Handle string `json:"handle"`
-		// TODO: take more from response?
 	}
-	if err := c.Get(ctx, "com.atproto.server.getSession", nil, &resp); err != nil {
+	if err := c.Get(ctx, "com.atproto.server.getSession", nil, &getSession); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	var getProfile struct {
+		Avatar      string `json:"avatar"`
+		DisplayName string `json:"displayName"`
+	}
+	profile := map[string]any{"actor": data.AccountDID.String()}
+	if err := c.Get(ctx, "app.bsky.actor.getProfile", profile, &getProfile); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	slog.Info("result", "profile", getProfile)
+
 	cookie, _ := s.CookieStore.Get(r, "oauth-session")
 	cookie.Values["account_did"] = data.AccountDID.String()
+	cookie.Values["display_name"] = getProfile.DisplayName
+	cookie.Values["avatar"] = getProfile.Avatar
 	cookie.Values["session_id"] = data.SessionID
-	cookie.Values["handle"] = resp.Handle
+	cookie.Values["handle"] = getSession.Handle
 	if err := cookie.Save(r, w); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -95,7 +109,7 @@ func (s *Server) ClientMetadata(w http.ResponseWriter, r *http.Request) {
 	if s.OAuth.Config.IsConfidential() {
 		meta.JWKSURI = strPtr(fmt.Sprintf("https://%s/oauth/jwks.json", r.Host))
 	}
-	meta.ClientName = strPtr("indigo atp-oauth-demo")
+	meta.ClientName = strPtr("ATlas")
 	meta.ClientURI = strPtr(fmt.Sprintf("https://%s", r.Host))
 
 	// internal consistency check
@@ -112,7 +126,7 @@ func (s *Server) ClientMetadata(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// TODO: remove?
+// TODO: move?
 func strPtr(raw string) *string {
 	return &raw
 }

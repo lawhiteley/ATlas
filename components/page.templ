@@ -15,20 +15,10 @@ templ Page(title string, atlas templ.Component, panel templ.Component) {
         <link href="/static/css/output.css" type="text/css" rel="stylesheet">
     </head>
     <body>
-        <div class="panel-container fixed left-4 z-50 m-5 bg-base-200/90 backdrop-blur-sm border-base-300 rounded-box w-xs border p-3 shadow-xl">
-            <h1 class="text-4xl m-1 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">ATlas</h1>
-            <!-- TODO: revisit -->
-            
-            <!-- if auth -->
-            
-            <!-- else -->
-            @panel <!-- rename to auth-panel? -->
-
-        </div>
-        <div class="map-container">
-            @atlas
-        </div>
-
+    @panel
+    <div class="map-container">
+        @atlas
+    </div>
     </body>
     </html>
 }

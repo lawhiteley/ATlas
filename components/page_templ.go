@@ -43,7 +43,7 @@ func Page(title string, atlas templ.Component, panel templ.Component) templ.Comp
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><script src=\"https://unpkg.com/htmx.org@2\"></script><script src=\"https://unpkg.com/alpinejs@3\" defer></script><script src=\"https://unpkg.com/maplibre-gl@^5.14.0/dist/maplibre-gl.js\"></script><link href=\" https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.min.css \" rel=\"stylesheet\"><link href=\"https://unpkg.com/maplibre-gl@^5.14.0/dist/maplibre-gl.css\" rel=\"stylesheet\"><link href=\"/static/css/output.css\" type=\"text/css\" rel=\"stylesheet\"></head><body><div class=\"panel-container fixed left-4 z-50 m-5 bg-base-200/90 backdrop-blur-sm border-base-300 rounded-box w-xs border p-3 shadow-xl\"><h1 class=\"text-4xl m-1 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent\">ATlas</h1><!-- TODO: revisit --><!-- if auth --><!-- else -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><script src=\"https://unpkg.com/htmx.org@2\"></script><script src=\"https://unpkg.com/alpinejs@3\" defer></script><script src=\"https://unpkg.com/maplibre-gl@^5.14.0/dist/maplibre-gl.js\"></script><link href=\" https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.min.css \" rel=\"stylesheet\"><link href=\"https://unpkg.com/maplibre-gl@^5.14.0/dist/maplibre-gl.css\" rel=\"stylesheet\"><link href=\"/static/css/output.css\" type=\"text/css\" rel=\"stylesheet\"></head><body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -51,7 +51,7 @@ func Page(title string, atlas templ.Component, panel templ.Component) templ.Comp
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<!-- rename to auth-panel? --></div><div class=\"map-container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"map-container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
