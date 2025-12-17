@@ -1,0 +1,6 @@
+[tools]
+go = '1.25'
+
+[tasks.dev]
+description = "Runs dev server on port 3000"
+run = "templ generate --watch --proxy='http://localhost:3000' --cmd='go run .'"
