@@ -4,6 +4,7 @@ import (
 	"ATlas/components"
 	"ATlas/db"
 	"ATlas/handlers"
+	"context"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -17,40 +18,43 @@ import (
 )
 
 func main() {
-	app := cli.App{
-		Name:   "oauth-web-demo",
-		Usage:  "atproto OAuth web server demo",
+	app := &cli.Command{
+		Name:   "ATlas",
 		Action: initializeServer,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:     "session-secret",
-				Usage:    "random string/token used for session cookie security",
-				Required: true,
-				EnvVars:  []string{"SESSION_SECRET"},
+				Name:    "bind",
+				Aliases: []string{"b"},
+				Usage:   "Server bind address",
+				Value:   ":3000",
 			},
 			&cli.StringFlag{
 				Name:    "hostname",
-				Usage:   "public host name for this client (if not localhost dev mode)",
-				EnvVars: []string{"CLIENT_HOSTNAME"},
+				Usage:   "Public hostname (will configure in localhost conditions if blank)",
+				Sources: cli.EnvVars("CLIENT_HOSTNAME"),
 			},
 			&cli.StringFlag{
 				Name:    "client-secret-key",
-				Usage:   "confidential client secret key. should be P-256 private key in multibase encoding",
-				EnvVars: []string{"CLIENT_SECRET_KEY"},
+				Usage:   "Key for confidential client. P-256 in multibase encoding",
+				Sources: cli.EnvVars("CLIENT_SECRET_KEY"),
 			},
 			&cli.StringFlag{
 				Name:    "client-secret-key-id",
-				Usage:   "key id for client-secret-key",
+				Usage:   "Key ID for $CLIENT_SECRET_KEY",
 				Value:   "primary",
-				EnvVars: []string{"CLIENT_SECRET_KEY_ID"},
+				Sources: cli.EnvVars("CLIENT_SECRET_KEY_ID"),
 			},
 		},
 	}
-	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
+
+	if err := app.Run(context.Background(), os.Args); err != nil {
+		slog.Error("ATlas failed to start", "error", err)
+		os.Exit(1)
+	}
 }
 
-func initializeServer(cctx *cli.Context) error {
-	bind := ":3000" // TODO: check for in-use port and panic
+func initializeServer(cctx context.Context, cmd *cli.Command) error {
+	bind := cmd.String("bind")
 	mux := http.NewServeMux()
 
 	// TODO: add confidential client support for deploy
@@ -96,9 +100,9 @@ func registerAppRoute(mux *http.ServeMux) {
 func registerAuthRoutes(mux *http.ServeMux, s *handlers.Server) {
 
 	// Outward-facing auth
-	mux.HandleFunc("GET /oauth/jwks.json", s.JWKS)
-	mux.HandleFunc("GET /oauth/client-metadata.json", s.ClientMetadata)
-	mux.HandleFunc("GET /oauth/callback", s.OAuthCallback)
+	mux.HandleFunc("GET /auth/jwks.json", s.JWKS)
+	mux.HandleFunc("GET /auth/client-metadata.json", s.ClientMetadata)
+	mux.HandleFunc("GET /auth/callback", s.OAuthCallback)
 
 	// User-facing auth
 	mux.HandleFunc("GET /auth/login", s.OAuthLogin)
