@@ -1,15 +1,17 @@
 package main
 
-import(
+import (
+	"ATlas/components"
 	"fmt" // TODO: logging - slog?
 	"net/http"
-	"ATlas/components"
 )
 
 func main() {
+	fs := http.FileServer(http.Dir("static"))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		index := components.Page("Luke", components.Atlas())
+		index := components.Page("Luke", components.Atlas(), components.Panel(false, "law.png", "Luke"))
 
 		index.Render(r.Context(), w)
 	})

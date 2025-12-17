@@ -9,7 +9,7 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 // TODO: pass userPanel templ.Component in here once marked up
-func Page(title string, atlas templ.Component) templ.Component {
+func Page(title string, atlas templ.Component, panel templ.Component) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -43,7 +43,15 @@ func Page(title string, atlas templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><script src=\"https://unpkg.com/htmx.org@2\"></script><script src=\"https://unpkg.com/alpinejs@3\" defer></script><script src=\"https://unpkg.com/maplibre-gl@^5.14.0/dist/maplibre-gl.js\"></script><link href=\"https://unpkg.com/maplibre-gl@^5.14.0/dist/maplibre-gl.css\" rel=\"stylesheet\"><style>\n        /* TODO: tweak/check each*/\n            .login-overlay {\n                position: absolute;\n                top: 20px;\n                left: 20px;\n                z-index: 1000;\n                background: white;\n                padding: 1rem;\n                border-radius: 8px;\n                box-shadow: 0 2px 10px rgba(0,0,0,0.1);\n                max-width: 300px;\n            }\n            .map-container {\n                width: 100vw;\n                height: 100vh;\n                position: relative;\n            }\n        </style></head><body><div class=\"map-container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><script src=\"https://unpkg.com/htmx.org@2\"></script><script src=\"https://unpkg.com/alpinejs@3\" defer></script><script src=\"https://unpkg.com/maplibre-gl@^5.14.0/dist/maplibre-gl.js\"></script><link href=\" https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.min.css \" rel=\"stylesheet\"><link href=\"https://unpkg.com/maplibre-gl@^5.14.0/dist/maplibre-gl.css\" rel=\"stylesheet\"><link href=\"/static/css/output.css\" type=\"text/css\" rel=\"stylesheet\"></head><body><div class=\"panel-container fixed left-4 z-50 m-5 bg-base-200/90 backdrop-blur-sm border-base-300 rounded-box w-xs border p-3 shadow-xl\"><h1 class=\"text-4xl m-1 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent\">ATlas</h1><!-- TODO: revisit --><!-- if auth --><!-- else -->")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = panel.Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<!-- rename to auth-panel? --></div><div class=\"map-container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -51,7 +59,7 @@ func Page(title string, atlas templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

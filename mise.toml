@@ -1,6 +1,24 @@
 [tools]
-go = '1.25'
+go = "1.25"
+bun = "1.3.4"
+
+[tasks]
+deps = "bun install"
+
+build-css = "bunx tailwindcss -c tailwind.config.js -i ./assets/input.css -o ./static/css/output.css --watch"
+
+build-templ = "templ generate --watch --proxy='http://localhost:3000' --cmd='go run .'"
 
 [tasks.dev]
-description = "Runs dev server on port 3000"
-run = "templ generate --watch --proxy='http://localhost:3000' --cmd='go run .'"
+description = "Runs a dev server"
+run = [
+    { tasks = ["build-css", "build-templ"] }
+]
+
+[tasks.build]
+description = "Cut a build"
+run = [
+    "templ generate",
+    "bunx tailwindcss -i ./assets/input.css -o ./static/css/output.css --minify",
+    "go build -o ./bin/app ."
+]

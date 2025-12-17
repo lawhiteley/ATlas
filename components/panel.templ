@@ -1,0 +1,16 @@
+package components
+
+templ Panel(authenticated bool, avatar string, handle string) {
+    <fieldset class="fieldset" >
+    // <legend class="fieldset-legend">Authenticate</legend>
+    <p class="label"></p>
+    <form action="/auth/bluesky" method="get">
+        <button class="btn btn-primary w-full"><i class="ri-bluesky-fill" />Log in with Bluesky</button>
+    </form>
+    <div class="divider">Or via the ATmosphere</div>
+        <form class="join" action="/auth/atproto" method="get">
+        <input type="text" class="input join-item" name="did" placeholder="@alice.example.com" />
+        <button class="btn btn-primary btn-outline join-item" value="Login">Go</button>
+        </form>
+    </fieldset>
+}

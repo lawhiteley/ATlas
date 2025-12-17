@@ -1,0 +1,13 @@
+{
+  "name": "ATlas",
+  "private": true,
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.18",
+    "@types/bun": "latest",
+    "daisyui": "^5.5.14",
+    "tailwindcss": "^4.1.18"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
