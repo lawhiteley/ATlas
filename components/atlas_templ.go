@@ -29,7 +29,7 @@ func Atlas() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"map\" style=\"width: 100%; height: 100%;\"></div><script>\n        const map = new maplibregl.Map({\n        container: 'map',\n        style: 'https://tiles.basemaps.cartocdn.com/gl/voyager-gl-style/style.json',\n        center: [15, 50],\n        zoom: 3\n        });\n\n        map.on('style.load', () => {\n            map.setProjection({\n                type: 'globe', // Set projection to globe\n            });\n        });\n    </script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"map\" style=\"width: 100%; height: 100%;\"></div><script>\n        const map = new maplibregl.Map({\n        container: 'map',\n        style: 'https://tiles.basemaps.cartocdn.com/gl/voyager-gl-style/style.json',\n        center: [13, 42],\n        zoom: 3.3\n        });\n\n        map.on('style.load', () => {\n            map.setProjection({\n                type: 'globe'\n            });\n        });\n\n\n\n    </script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -91,6 +91,7 @@ func initializeServer(cctx context.Context, cmd *cli.Command) error {
 func registerAppRoutes(mux *http.ServeMux, s *handlers.Server) {
 	mux.HandleFunc("GET /", s.Globe)
 
+	mux.HandleFunc("POST /pin", s.newPin)
 }
 
 func registerAuthRoutes(mux *http.ServeMux, s *handlers.Server) {

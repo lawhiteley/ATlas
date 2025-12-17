@@ -6,14 +6,17 @@ templ Atlas() {
         const map = new maplibregl.Map({
         container: 'map',
         style: 'https://tiles.basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-        center: [15, 50],
-        zoom: 3
+        center: [13, 42],
+        zoom: 3.3
         });
 
         map.on('style.load', () => {
             map.setProjection({
-                type: 'globe', // Set projection to globe
+                type: 'globe'
             });
         });
+
+
+
     </script>
 }
