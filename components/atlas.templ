@@ -1,22 +1,8 @@
 package components
 
 templ Atlas() {
-    <div id="map" style="width: 100%; height: 100%;"></div>
-    <script>
-        const map = new maplibregl.Map({
-        container: 'map',
-        style: 'https://tiles.basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-        center: [13, 42],
-        zoom: 3.3
-        });
-
-        map.on('style.load', () => {
-            map.setProjection({
-                type: 'globe'
-            });
-        });
-
-
-
-    </script>
+    <div id="pins"></div>
+    <div id="map" style="width: 100%; height: 100%;">
+    </div>
+    <script src="/static/js/atlas.js"></script>
 }

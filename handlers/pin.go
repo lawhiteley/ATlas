@@ -2,22 +2,43 @@ package handlers
 
 import (
 	"encoding/json"
+	"log/slog"
 	"net/http"
+	"strconv"
+
+	"ATlas/models"
 )
 
-type Pin struct {
-	Did         string
-	Longitude   float64
-	Latitude    float64
-	Handle      string
-	Description string
-}
-
 func (s *Server) NewPin(w http.ResponseWriter, r *http.Request) {
-	var pin Pin
-	if err := json.NewDecoder(r.Body).Decode(&pin); err != nil {
-		http.Error(w, "Bad pin", http.StatusBadRequest)
+
+	// for now just add every pin
+	if err := r.ParseForm(); err != nil {
+		slog.Info("err", "err", err)
+
+		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
-	// for now just add every pin
+
+	// TODO: validate these
+	longitude, _ := strconv.ParseFloat(r.FormValue("longitude"), 64)
+	latitude, _ := strconv.ParseFloat(r.FormValue("latitude"), 64)
+	description := r.FormValue("description")
+
+	slog.Info("placed at", "lat", latitude, "long", longitude)
+	session := s.getDID(r)
+
+	pin := &models.Pin{
+		Did:         string(*s.getDID(r).DID),
+		Longitude:   longitude,
+		Latitude:    latitude,
+		Description: description,
+		Name:        session.Name,
+		Handle:      session.Handle,
+		Avatar:      session.Avatar,
+	}
+
+	// TODO: persist
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(pin)
 }

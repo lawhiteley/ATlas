@@ -1,6 +1,5 @@
 package components
 
-// TODO: pass userPanel templ.Component in here once marked up
 templ Page(title string, atlas templ.Component, panel templ.Component) {
         <!DOCTYPE html>
     <html>
@@ -16,9 +15,7 @@ templ Page(title string, atlas templ.Component, panel templ.Component) {
     </head>
     <body>
     @panel
-    <div class="map-container">
-        @atlas
-    </div>
+    @atlas
     </body>
     </html>
 }

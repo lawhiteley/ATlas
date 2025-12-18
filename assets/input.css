@@ -1,2 +1,21 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.maplibregl-popup-content {
+    padding: 0 !important;
+    border-radius: var(--rounded-box, 1rem) !important;
+    background: transparent !important;
+}
+
+.maplibregl-popup-tip {
+    border-top-color: color-mix(in oklch, var(--color-base-100), transparent 10%) !important;
+        border-bottom-color: color-mix(in oklch, var(--color-base-100), transparent 10%) !important;
+
+}
