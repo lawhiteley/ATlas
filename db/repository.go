@@ -1,8 +1,10 @@
 package db
 
 import (
+	"ATlas/models"
 	"context"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/bluesky-social/indigo/atproto/auth/oauth"
@@ -41,6 +43,16 @@ type storedAuthRequest struct {
 	CreatedAt time.Time             `gorm:"index"`
 }
 
+type storedPin struct {
+	Did         string `gorm:"primaryKey"`
+	Longitude   float64
+	Latitude    float64
+	Name        string
+	Handle      string
+	Description string
+	Avatar      string
+}
+
 func NewSQLiteStore(cfg *SQLiteConfig) (*SQLiteStore, error) {
 	if cfg == nil {
 		return nil, fmt.Errorf("missing cfg")
@@ -65,19 +77,55 @@ func NewSQLiteStore(cfg *SQLiteConfig) (*SQLiteStore, error) {
 
 	db.AutoMigrate(&storedSessionData{})
 	db.AutoMigrate(&storedAuthRequest{})
+	db.AutoMigrate(&storedPin{})
 
 	return &SQLiteStore{db, cfg}, nil
 }
 
+// Default page load behaviour
+// TODO: add ability to load KNN for given lat/long
+func (m *SQLiteStore) GetPins(ctx context.Context) ([]models.Pin, error) {
+	var storedPins []storedPin
+	res := m.db.WithContext(ctx).Limit(10000).Find(&storedPins) // Add ordering/increase limit/etc...
+
+	pins := make([]models.Pin, len(storedPins))
+	for i, sp := range storedPins {
+		pins[i] = sp.toPin()
+	}
+
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	slog.Info("test", "r", storedPins)
+	return pins, nil
+}
+
+func (m *SQLiteStore) SavePin(ctx context.Context, pin models.Pin) error {
+	res := m.db.WithContext(ctx).Clauses(clause.OnConflict{
+		UpdateAll: true,
+	}).Create(&storedPin{
+		Did:         pin.Did,
+		Longitude:   pin.Longitude,
+		Latitude:    pin.Latitude,
+		Name:        pin.Name,
+		Handle:      pin.Handle,
+		Description: pin.Description,
+		Avatar:      pin.Avatar,
+	})
+
+	slog.Info("pin persist", "err", res.Error)
+	return res.Error
+}
+
 func (m *SQLiteStore) GetSession(ctx context.Context, did syntax.DID, sessionID string) (*oauth.ClientSessionData, error) {
-	// bookkeeping: delete expired sessions
+	// Expire sessions that are expired or inactive
 	expiry_threshold := time.Now().Add(-m.cfg.SessionExpiry)
 	inactive_threshold := time.Now().Add(-m.cfg.InactivityExpiry)
 	m.db.WithContext(ctx).Where(
 		"created_at < ? OR updated_at < ?", expiry_threshold, inactive_threshold,
 	).Delete(&storedSessionData{})
 
-	// finally, the query itself
 	var row storedSessionData
 	res := m.db.WithContext(ctx).Where(&storedSessionData{
 		AccountDid: did,
@@ -90,7 +138,6 @@ func (m *SQLiteStore) GetSession(ctx context.Context, did syntax.DID, sessionID 
 }
 
 func (m *SQLiteStore) SaveSession(ctx context.Context, sess oauth.ClientSessionData) error {
-	// upsert
 	res := m.db.WithContext(ctx).Clauses(clause.OnConflict{
 		UpdateAll: true,
 	}).Create(&storedSessionData{
@@ -110,11 +157,10 @@ func (m *SQLiteStore) DeleteSession(ctx context.Context, did syntax.DID, session
 }
 
 func (m *SQLiteStore) GetAuthRequestInfo(ctx context.Context, state string) (*oauth.AuthRequestData, error) {
-	// bookkeeping: delete expired auth requests
+	// Delete expired auth requests
 	threshold := time.Now().Add(-m.cfg.RequestExpiry)
 	m.db.WithContext(ctx).Where("created_at < ?", threshold).Delete(&storedAuthRequest{})
 
-	// finally, the query itself
 	var row storedAuthRequest
 	res := m.db.WithContext(ctx).Where(&storedAuthRequest{State: state}).First(&row)
 	if res.Error != nil {
@@ -124,7 +170,6 @@ func (m *SQLiteStore) GetAuthRequestInfo(ctx context.Context, state string) (*oa
 }
 
 func (m *SQLiteStore) SaveAuthRequestInfo(ctx context.Context, info oauth.AuthRequestData) error {
-	// will fail if an auth request already exists for the same state
 	res := m.db.WithContext(ctx).Create(&storedAuthRequest{
 		State: info.State,
 		Data:  info,
@@ -135,4 +180,16 @@ func (m *SQLiteStore) SaveAuthRequestInfo(ctx context.Context, info oauth.AuthRe
 func (m *SQLiteStore) DeleteAuthRequestInfo(ctx context.Context, state string) error {
 	res := m.db.WithContext(ctx).Delete(&storedAuthRequest{State: state})
 	return res.Error
+}
+
+func (sp storedPin) toPin() models.Pin {
+	return models.Pin{
+		Did:         sp.Did,
+		Longitude:   sp.Longitude,
+		Latitude:    sp.Latitude,
+		Name:        sp.Name,
+		Handle:      sp.Handle,
+		Description: sp.Description,
+		Avatar:      sp.Avatar,
+	}
 }

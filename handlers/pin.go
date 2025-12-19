@@ -9,9 +9,13 @@ import (
 	"ATlas/models"
 )
 
+// add GET /pin handler for streaming pins as map scrolls
+
 func (s *Server) NewPin(w http.ResponseWriter, r *http.Request) {
 
 	// for now just add every pin
+	// eventually
+	// reject if DID has a pin younger than 1 month
 	if err := r.ParseForm(); err != nil {
 		slog.Info("err", "err", err)
 
@@ -37,6 +41,7 @@ func (s *Server) NewPin(w http.ResponseWriter, r *http.Request) {
 		Avatar:      session.Avatar,
 	}
 
+	s.Repository.SavePin(r.Context(), *pin)
 	// TODO: persist
 
 	w.Header().Set("Content-Type", "application/json")

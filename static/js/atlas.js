@@ -97,3 +97,8 @@ function createMarkerForPin(pin) {
 
     return marker;
 }
+
+const pinsElement = document.getElementById('pins');
+const pinsData = JSON.parse(pinsElement.dataset.pins);
+console.log(`law ${pinsData}`)
+pinsData.map(createMarkerForPin);

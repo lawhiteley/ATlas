@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"ATlas/db"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -157,6 +158,7 @@ func (s *Server) JWKS(w http.ResponseWriter, r *http.Request) {
 }
 
 type Server struct {
+	Repository  *db.SQLiteStore
 	CookieStore *sessions.CookieStore
 	Dir         identity.Directory
 	OAuth       *oauth.ClientApp

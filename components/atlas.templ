@@ -1,8 +1,15 @@
 package components
 
-templ Atlas() {
-    <div id="pins"></div>
-    <div id="map" style="width: 100%; height: 100%;">
-    </div>
+import "ATlas/models"
+
+templ Atlas(pins []models.Pin) {
+    <div id="map" style="width: 100%; height: 100%;"></div>
+     {{ asJSON, _ := templ.JSONString(pins) }}
+    <div 
+        id="pins" 
+        style="width: 100%; height: 100%;"
+        data-pins={asJSON}
+    ></div>
     <script src="/static/js/atlas.js"></script>
+    //  <div id="pins">{asJSON}</div>
 }

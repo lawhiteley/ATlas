@@ -63,7 +63,7 @@ func initializeServer(cctx context.Context, cmd *cli.Command) error {
 	)
 
 	store, _ := db.NewSQLiteStore(&db.SQLiteConfig{
-		Path:             "oauth_sessions.sqlite3",
+		Path:             "atlas_data.sqlite3",
 		SessionExpiry:    time.Hour * 24 * 90,
 		InactivityExpiry: time.Hour * 24 * 14,
 		RequestExpiry:    time.Minute * 30,
@@ -71,6 +71,7 @@ func initializeServer(cctx context.Context, cmd *cli.Command) error {
 
 	oauthClient := oauth.NewClientApp(&config, store)
 	srv := handlers.Server{
+		Repository:  store,
 		CookieStore: sessions.NewCookieStore([]byte("dfklsdjfkjldfjklsdfjlf")), // TODO: cctx.String("session-secret") from CLI arg
 		Dir:         identity.DefaultDirectory(),
 		OAuth:       oauthClient,
