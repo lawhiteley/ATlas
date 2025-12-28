@@ -1,14 +1,20 @@
 package components
 
-templ Page(title string, atlas templ.Component, panel templ.Component) {
-        <!DOCTYPE html>
+import "ATlas/models"
+
+
+templ Page(atlas templ.Component, panel templ.Component, pin *models.Pin) {
+    <!DOCTYPE html>
     <html>
     <head>
-        <title>{ title }</title>
+        <title>ATlas</title>
         <script src="https://unpkg.com/htmx.org@2"></script>
         <script src="https://unpkg.com/alpinejs@3" defer></script>
         <script src="https://unpkg.com/maplibre-gl@^5.14.0/dist/maplibre-gl.js"></script>
-
+        if (pin.Did != "") {
+            <script>window.savedPin = {{ pin }}</script>
+        }
+    
         <link href=" https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.min.css " rel="stylesheet">
         <link href="https://unpkg.com/maplibre-gl@^5.14.0/dist/maplibre-gl.css" rel="stylesheet" />
         <link href="/static/css/output.css" type="text/css" rel="stylesheet">

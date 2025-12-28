@@ -1,7 +1,10 @@
+const pinsElement = document.getElementById('pins');
+const pinsData = JSON.parse(pinsElement.dataset.pins);
+const { Longitude: long = 13, Latitude: lat = 42 } = window.savedPin || {}; // TODO: maybe default to geoloc
 const map = new maplibregl.Map({
 container: 'map',
 style: 'https://tiles.basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-center: [13, 42], // TODO: maybe centre on rough visitor geoloc 
+center: [long, lat],
 zoom: 3.3
 });
 
@@ -18,6 +21,7 @@ const popup = new maplibregl.Popup({
 });
 
 map.on('click', (e) => {
+    if (Alpine.store('savedPin').hasPin) return;
     const coords = e.lngLat;
     
     const popupContent = document.createElement('div');
@@ -69,12 +73,14 @@ async function addPin(coords, description) {
         });
 
         const pin = await response.json();
+        pinsData[pin.Did] = pin; // TODO: remove this?
+        Alpine.store('savedPin').data = pin;
 
         createMarkerForPin(pin);
 
         return pin;
     } catch (error) {
-        console.error(`string text ${error} string text`)
+        console.error(`Failed to add pin: ${error}`)
     }
 }
 
@@ -93,12 +99,37 @@ function createMarkerForPin(pin) {
         .setLngLat([pin.Longitude, pin.Latitude])
         .addTo(map);
 
-    marker._pin = pin; // TODO: remove?
+    pinsData[pin.Did].marker = marker; // TODO: only actually need to store reference to own marker
+    marker._pin = pin;
 
     return marker;
 }
 
-const pinsElement = document.getElementById('pins');
-const pinsData = JSON.parse(pinsElement.dataset.pins);
-console.log(`law ${pinsData}`)
-pinsData.map(createMarkerForPin);
+// Paint pins on map
+Object.values(pinsData).map(createMarkerForPin);
+
+document.addEventListener('alpine:init', () => {
+    Alpine.store('savedPin', {
+        data: window.savedPin || null,
+
+        get hasPin() {
+            return this.data !== null;
+        },
+        
+        async remove() {
+            await fetch('/pin', { method: 'DELETE' });
+            pinsData[this.data.Did].marker.remove();
+            this.data = null;
+        },
+
+        flyToUserPin() {
+            if (this.data) {
+                map.flyTo({
+                    center: [this.data.Longitude, this.data.Latitude],
+                    speed: 0.8,
+                    zoom: 9,  
+                });
+            }
+        }
+    });
+});

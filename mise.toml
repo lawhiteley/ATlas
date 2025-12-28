@@ -19,7 +19,7 @@ run = [
 raw = true
 
 [tasks.build]
-description = "Cut a build"
+description = "Cuts a build"
 run = [
     "go tool templ generate",
     "bunx tailwindcss -i ./assets/input.css -o ./static/css/output.css --minify",

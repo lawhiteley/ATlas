@@ -118,6 +118,13 @@ func (m *SQLiteStore) SavePin(ctx context.Context, pin models.Pin) error {
 	return res.Error
 }
 
+func (m *SQLiteStore) DeletePin(ctx context.Context, did string) error {
+	res := m.db.WithContext(ctx).Where("did = ?", did).Delete(&storedPin{})
+
+	slog.Info("pin delete", "err", res.Error)
+	return res.Error
+}
+
 func (m *SQLiteStore) GetSession(ctx context.Context, did syntax.DID, sessionID string) (*oauth.ClientSessionData, error) {
 	// Expire sessions that are expired or inactive
 	expiry_threshold := time.Now().Add(-m.cfg.SessionExpiry)

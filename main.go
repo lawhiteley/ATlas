@@ -93,6 +93,8 @@ func registerAppRoutes(mux *http.ServeMux, s *handlers.Server) {
 	mux.HandleFunc("GET /", s.Globe)
 
 	mux.HandleFunc("POST /pin", s.NewPin)
+	mux.HandleFunc("DELETE /pin", s.RemovePin)
+
 }
 
 func registerAuthRoutes(mux *http.ServeMux, s *handlers.Server) {

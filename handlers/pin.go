@@ -42,8 +42,19 @@ func (s *Server) NewPin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.Repository.SavePin(r.Context(), *pin)
-	// TODO: persist
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(pin)
+}
+
+func (s *Server) RemovePin(w http.ResponseWriter, r *http.Request) {
+	sessionDid := s.getDID(r).DID.String()
+
+	err := s.Repository.DeletePin(r.Context(), sessionDid)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	} else {
+		w.WriteHeader(http.StatusNoContent)
+	}
 }

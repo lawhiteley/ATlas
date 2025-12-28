@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"ATlas/components"
+	"ATlas/models"
 	"log/slog"
 	"net/http"
 )
@@ -18,8 +19,11 @@ func (s *Server) Globe(w http.ResponseWriter, r *http.Request) {
 
 	session := s.getDID(r)
 	slog.Info("result", "did", session.DID, "sesh", session.Avatar, "handle", session.Handle, "name", session.Name)
+
+	didMap := ToDidMap(pins)
 	if session.DID == nil {
-		v := components.Page("", components.Atlas(pins), components.Panel(false, session))
+		// TODO: default values
+		v := components.Page(components.Atlas("", didMap), components.Panel(false, session), nil)
 		v.Render(ctx, w)
 		return
 	}
@@ -28,7 +32,18 @@ func (s *Server) Globe(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// oauth failed
 	}
-	v := components.Page("", components.Atlas(pins), components.Panel(true, session))
-	v.Render(ctx, w)
 
+	userDid := session.DID.String()
+	userPin := didMap[userDid]
+	v := components.Page(components.Atlas(userDid, didMap), components.Panel(true, session), &userPin)
+	v.Render(ctx, w)
+}
+
+func ToDidMap(pins []models.Pin) map[string]models.Pin {
+	didMap := make(map[string]models.Pin, len(pins))
+	for _, pin := range pins {
+		didMap[pin.Did] = pin
+	}
+
+	return didMap
 }
