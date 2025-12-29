@@ -1,6 +1,6 @@
 const pinsElement = document.getElementById('pins');
 const pinsData = JSON.parse(pinsElement.dataset.pins);
-const { Longitude: long = 13, Latitude: lat = 42 } = window.savedPin || {}; // TODO: maybe default to geoloc
+const { Longitude: long = 13, Latitude: lat = 42 } = window.savedPin || {};
 const map = new maplibregl.Map({
 container: 'map',
 style: 'https://tiles.basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
@@ -25,26 +25,24 @@ map.on('click', (e) => {
     const coords = e.lngLat;
     
     const popupContent = document.createElement('div');
-    popupContent.className = 'shadow-xl bg-base-200/90 backdrop-blur-sm border-base-300 rounded-box';
+    popupContent.className = 'card shadow-xl bg-base-200/90 backdrop-blur-sm border-base-300 rounded-box';
     popupContent.innerHTML = `
-        <div class="card-body">
+        <fieldset class="card-body p-3 m-2">
             <div class="card-title flex justify-between items-center">
-                <h3 class="text-lg font-bold">Place a Pin</h3>
+            <legend class="fieldset-legend">Place your Pin</legend>
                 <button class="btn btn-sm btn-circle btn-ghost close-popup">
                     <i class="ri-close-line text-lg"></i>
                 </button>
             </div>
-            <p class="text-sm text-base-content/70 mb-2">Click the button to place a pin at these coordinates:</p>
-            <div class="bg-base-200 p-3 rounded-lg mb-4">
-                <code class="text-sm">${coords.lng.toFixed(6)}, ${coords.lat.toFixed(6)}</code>
-            </div>
-            <div class="card-actions justify-end">
-                <button class="btn btn-primary btn-sm place-pin-btn">
-                    <i class="ri-map-pin-line mr-2"></i>
-                    Place Pin
-                </button>
-            </div>
-        </div>
+            <label class="label">Description</label>
+            <textarea placeholder="What are you doing here?" class="textarea textarea-s pin-description"></textarea>
+
+            <label class="label">Website</label>
+            <input type="text" class="input input-s pin-website" placeholder="https://luke.whiteley.io" />
+            <button class="btn btn-primary btn-sm place-pin-btn">
+                <i class="ri-map-pin-line mr-2"></i> Place Pin
+            </button>
+        </fieldset>
     `;
     
     popup.setDOMContent(popupContent);
@@ -55,12 +53,15 @@ map.on('click', (e) => {
     });
     
     popupContent.querySelector('.place-pin-btn').addEventListener('click', () => {
-        addPin(coords, "hello");
+        const description = popupContent.querySelector('.pin-description').value;
+        const website = popupContent.querySelector('.pin-website').value;
+
+        addPin(coords, description, website);
         popup.remove();
     });
 });
 
-async function addPin(coords, description) {
+async function addPin(coords, description, website) {
     try {
         const response = await fetch('/pin', {
             method: "POST",
@@ -68,7 +69,8 @@ async function addPin(coords, description) {
             body: new URLSearchParams({
                 longitude: coords.lng,
                 latitude: coords.lat,
-                description: description
+                description: description,
+                website: website
             })
         });
 

@@ -7,5 +7,6 @@ type Pin struct {
 	Name        string
 	Handle      string
 	Description string
+	Website     string
 	Avatar      string
 }

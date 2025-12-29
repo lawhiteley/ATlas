@@ -60,7 +60,8 @@ templ Panel(authenticated bool, user models.Session) {
         
         <div class="divider"></div>
 
-        <div x-data x-show="$store.savedPin.hasPin" class="pin-info">            
+        <div x-data x-show="$store.savedPin.hasPin" class="pin-info">
+            <legend class="fieldset-legend">My Pin</legend>        
             <div class="mt-2 text-sm" x-text="$store.savedPin.data.Description"></div>
             
             <div class="mt-3 flex items-center justify-between">
@@ -77,5 +78,10 @@ templ Panel(authenticated bool, user models.Session) {
                 </button>
             </div>
         </div>
+
+        <div x-data x-show="!$store.savedPin.hasPin" class="pin-info">            
+            <p class="mt-2 text-sm">You don't have a pin set. Click the map to place one!</p>
+        </div>
+    
     </div>
 }

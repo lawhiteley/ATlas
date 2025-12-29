@@ -27,6 +27,7 @@ func (s *Server) NewPin(w http.ResponseWriter, r *http.Request) {
 	longitude, _ := strconv.ParseFloat(r.FormValue("longitude"), 64)
 	latitude, _ := strconv.ParseFloat(r.FormValue("latitude"), 64)
 	description := r.FormValue("description")
+	website := r.FormValue("website")
 
 	slog.Info("placed at", "lat", latitude, "long", longitude)
 	session := s.getDID(r)
@@ -36,6 +37,7 @@ func (s *Server) NewPin(w http.ResponseWriter, r *http.Request) {
 		Longitude:   longitude,
 		Latitude:    latitude,
 		Description: description,
+		Website:     website,
 		Name:        session.Name,
 		Handle:      session.Handle,
 		Avatar:      session.Avatar,
