@@ -88,21 +88,60 @@ async function addPin(coords, description, website) {
 
 function createMarkerForPin(pin) {
     const newElement = document.createElement('div');
-    newElement.className = 'pin';
+    newElement.className = 'pin cursor-pointer';
     newElement.innerHTML = `
         <div class="avatar">
           <div class="w-10 rounded-full ring-2 ring-primary ring-offset-2 ring-offset-base-100">
             <img src="${pin.Avatar}" alt="${pin.Name}" class="object-cover" />
           </div>
         </div>
-    `
+    `;
 
     const marker = new maplibregl.Marker({ element: newElement, anchor: 'center' })
         .setLngLat([pin.Longitude, pin.Latitude])
         .addTo(map);
 
-    pinsData[pin.Did].marker = marker; // TODO: only actually need to store reference to own marker
+    pinsData[pin.Did].marker = marker;
     marker._pin = pin;
+
+    const popupContent = document.createElement('div');
+    popupContent.className = 'p-0 overflow-hidden rounded-box w-80';
+    popupContent.innerHTML = `
+        <div class="card bg-base-100 shadow-xl">
+            <button class="btn btn-circle btn-xs absolute right-3 top-3 z-10 close-popup hover:bg-primary">
+                <i class="ri-close-line text-lg"></i>
+            </button>
+            <figure>
+                <img src="${pin.Avatar}" alt="${pin.Name}" class="h-40 w-full object-cover" />
+            </figure>
+            <div class="card-body p-4">
+                <div class="flex-1 min-w-0">
+                    <div class="font-semibold text-base truncate">${pin.Name}</div>
+                    <div class="text-sm text-base-content/60 truncate">${pin.Handle}</div>
+                </div>
+                ${pin.Description ? `<p>${pin.Description}</p>` : ''}
+                ${pin.Website ? `<a class="link link-primary">${pin.Website}</a>` : ''}
+            </div>
+        </div>
+    `;
+
+    const popup = new maplibregl.Popup({
+        offset: 25,
+        closeButton: false,
+        closeOnClick: true,
+        className: 'maplibregl-popup-content rounded-box shadow-2xl p-0'
+    }).setDOMContent(popupContent);
+
+    newElement.addEventListener('click', (e) => {
+        e.stopPropagation();
+        marker.setPopup(popup).togglePopup();
+
+        setTimeout(() => {
+            popupContent.querySelector('.close-popup').addEventListener('click', () => {
+                popup.remove();
+            });
+        }, 0);
+    });
 
     return marker;
 }

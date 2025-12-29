@@ -50,6 +50,7 @@ type storedPin struct {
 	Name        string
 	Handle      string
 	Description string
+	Website     string
 	Avatar      string
 }
 
@@ -111,6 +112,7 @@ func (m *SQLiteStore) SavePin(ctx context.Context, pin models.Pin) error {
 		Name:        pin.Name,
 		Handle:      pin.Handle,
 		Description: pin.Description,
+		Website:     pin.Website,
 		Avatar:      pin.Avatar,
 	})
 
@@ -197,6 +199,7 @@ func (sp storedPin) toPin() models.Pin {
 		Name:        sp.Name,
 		Handle:      sp.Handle,
 		Description: sp.Description,
+		Website:     sp.Website,
 		Avatar:      sp.Avatar,
 	}
 }
