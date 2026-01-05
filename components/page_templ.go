@@ -35,7 +35,7 @@ func Page(atlas templ.Component, panel templ.Component, pin *models.Pin) templ.C
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if pin.Did != "" {
+		if pin != nil && pin.Did != "" {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<script>window.savedPin = ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

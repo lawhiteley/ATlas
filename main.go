@@ -59,7 +59,11 @@ func initializeServer(cctx context.Context, cmd *cli.Command) error {
 	// TODO: add confidential client support for deploy
 	config := oauth.NewLocalhostConfig(
 		fmt.Sprintf("http://127.0.0.1%s/auth/callback", bind),
-		[]string{"atproto", "rpc:app.bsky.actor.getProfile?aud=did:web:api.bsky.app%23bsky_appview"}, // TODO: switch out for pin lexicon later
+		[]string{
+			"atproto",
+			"rpc:app.bsky.actor.getProfile?aud=did:web:api.bsky.app%23bsky_appview",
+			"repo:io.whiteley.luke.ATlas.pin",
+		}, // TODO: extract
 	)
 
 	store, _ := db.NewSQLiteStore(&db.SQLiteConfig{
@@ -70,6 +74,7 @@ func initializeServer(cctx context.Context, cmd *cli.Command) error {
 	})
 
 	oauthClient := oauth.NewClientApp(&config, store)
+
 	srv := handlers.Server{
 		Repository:  store,
 		CookieStore: sessions.NewCookieStore([]byte("dfklsdjfkjldfjklsdfjlf")), // TODO: cctx.String("session-secret") from CLI arg

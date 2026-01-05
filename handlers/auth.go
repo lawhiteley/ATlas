@@ -58,6 +58,7 @@ func (s *Server) OAuthCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	session, err := s.OAuth.ResumeSession(ctx, data.AccountDID, data.SessionID)
+
 	if err != nil {
 		http.Error(w, "not authenticated", http.StatusUnauthorized)
 		return
@@ -87,7 +88,13 @@ func (s *Server) OAuthCallback(w http.ResponseWriter, r *http.Request) {
 	cookie, _ := s.CookieStore.Get(r, "oauth-session")
 	cookie.Values["account_did"] = data.AccountDID.String()
 	cookie.Values["display_name"] = getProfile.DisplayName
-	cookie.Values["avatar"] = getProfile.Avatar
+
+	if getProfile.Avatar != "" {
+		cookie.Values["avatar"] = getProfile.Avatar
+	} else {
+		cookie.Values["avatar"] = "/static/img/default_avatar.jpg"
+	}
+
 	cookie.Values["session_id"] = data.SessionID
 	cookie.Values["handle"] = getSession.Handle
 	if err := cookie.Save(r, w); err != nil {
