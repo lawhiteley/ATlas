@@ -86,6 +86,8 @@ async function addPin(coords, description, website) {
     }
 }
 
+let openPin = null;
+
 function createMarkerForPin(pin) {
     const newElement = document.createElement('div');
     newElement.className = 'pin cursor-pointer';
@@ -134,12 +136,23 @@ function createMarkerForPin(pin) {
 
     newElement.addEventListener('click', (e) => {
         e.stopPropagation();
+
+        if (openPin && openPin !== popup) {
+            openPin.remove();
+        }
+
         marker.setPopup(popup).togglePopup();
 
+        openPin = popup;
+
         setTimeout(() => {
-            popupContent.querySelector('.close-popup').addEventListener('click', () => {
-                popup.remove();
-            });
+            const closeButton = popupContent.querySelector('.close-popup');
+            if (closeButton) {
+                closeButton.addEventListener('click', () => {
+                    popup.remove();
+                    openPin = null;
+                });
+            }
         }, 0);
     });
 
