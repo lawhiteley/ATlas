@@ -58,7 +58,6 @@ func (s *Server) OAuthCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	session, err := s.OAuth.ResumeSession(ctx, data.AccountDID, data.SessionID)
-
 	if err != nil {
 		http.Error(w, "not authenticated", http.StatusUnauthorized)
 		return

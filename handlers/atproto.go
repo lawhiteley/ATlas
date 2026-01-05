@@ -3,25 +3,68 @@ package handlers
 import (
 	"ATlas/models"
 	"context"
+	"log/slog"
+	"strconv"
+	"time"
 
 	"github.com/bluesky-social/indigo/api/atproto"
-	"github.com/bluesky-social/indigo/xrpc"
+	"github.com/bluesky-social/indigo/atproto/syntax"
+	"github.com/bluesky-social/indigo/lex/util"
 )
 
-func (s *Server) PutPinRecord(session models.Session) {
-	// TODO: capture and handle err from GetSession
-	sess, _ := s.Repository.GetSession(context.Background(), *session.DID, session.SessionID)
-	client := &xrpc.Client{
-		Host: "https://bsky.social", // TODO: configurable
-		Auth: &xrpc.AuthInfo{
-			AccessJwt:  sess.AccessToken,
-			RefreshJwt: sess.RefreshToken,
-			Did:        session.DID.String(),
-		},
+func (s *Server) PutPinRecord(session models.Session, pin models.Pin) {
+	// TODO: refactor err handling etc..
+
+	client, _ := s.OAuth.ResumeSession(context.Background(), *session.DID, session.SessionID)
+	at := client.APIClient()
+
+	pinRecord := &atproto.RepoPutRecord_Input{
+		Collection: "io.whiteley.luke.ATlas.pin",
+		Repo:       session.DID.String(),
+		Rkey:       "self",
+		Record: &util.LexiconTypeDecoder{Val: &models.ATlasPin{
+			Did:         session.DID.String(),
+			PlacedAt:    time.Now().UTC().Format(time.RFC3339),
+			Longitude:   strconv.FormatFloat(pin.Latitude, 'f', -1, 64),
+			Latitude:    strconv.FormatFloat(pin.Longitude, 'f', -1, 64),
+			Description: pin.Description,
+			Website:     &pin.Website,
+		}},
 	}
 
-	// TODO: log above output
+	slog.Info("atproto prepped", "record", pinRecord)
+	var response struct { // TODO: persist and surface this
+		Uri syntax.ATURI `json:"uri"`
+	}
 
-	// TODO: handle Pin construct and failure scenario
-	atproto.RepoPutRecord(context.Background(), client, &atproto.RepoPutRecord_Input{})
+	if err := at.Post(context.Background(), "com.atproto.repo.createRecord", pinRecord, &response); err != nil {
+		slog.Info("atproto bad", "err", err)
+
+	}
+	slog.Info("atproto good", "resp", response)
+
+}
+
+func (s *Server) DeletePinRecord(session models.Session) {
+	// TODO: refactor err handling etc..
+	// TODO: check DID equality?
+
+	client, _ := s.OAuth.ResumeSession(context.Background(), *session.DID, session.SessionID)
+	at := client.APIClient()
+
+	record := map[string]any{
+		"collection": "io.whiteley.luke.ATlas.pin",
+		"repo":       session.DID.String(),
+		"rkey":       "self",
+	}
+
+	slog.Info("atproto prepped", "record", record)
+
+	if err := at.Post(context.Background(), "com.atproto.repo.deleteRecord", record, nil); err != nil {
+		slog.Info("atproto bad", "err", err)
+
+	}
+
+	slog.Info("atproto good")
+
 }

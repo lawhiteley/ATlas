@@ -43,6 +43,7 @@ func (s *Server) NewPin(w http.ResponseWriter, r *http.Request) {
 		Avatar:      session.Avatar,
 	}
 
+	s.PutPinRecord(session, *pin)
 	s.Repository.SavePin(r.Context(), *pin)
 
 	w.Header().Set("Content-Type", "application/json")
@@ -50,9 +51,10 @@ func (s *Server) NewPin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) RemovePin(w http.ResponseWriter, r *http.Request) {
-	sessionDid := s.getDID(r).DID.String()
+	session := s.getDID(r)
 
-	err := s.Repository.DeletePin(r.Context(), sessionDid)
+	s.DeletePinRecord(session)
+	err := s.Repository.DeletePin(r.Context(), session.DID.String())
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)

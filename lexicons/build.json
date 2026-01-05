@@ -1,7 +1,0 @@
-[
-  {
-    "package": "models",
-    "prefix": "io.whiteley.luke",
-    "outdir": "./models/"
-  }
-]

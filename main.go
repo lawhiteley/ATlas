@@ -62,7 +62,7 @@ func initializeServer(cctx context.Context, cmd *cli.Command) error {
 		[]string{
 			"atproto",
 			"rpc:app.bsky.actor.getProfile?aud=did:web:api.bsky.app%23bsky_appview",
-			"repo:io.whiteley.luke.ATlas.pin",
+			"transition:generic",
 		}, // TODO: extract
 	)
 
