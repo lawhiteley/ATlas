@@ -80,7 +80,7 @@ func Panel(authenticated bool, user models.Session) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"space-y-3\"><form action=\"/auth/login\" method=\"post\"><button class=\"btn btn-primary w-full gap-2\"><i class=\"ri-bluesky-fill\"></i> Log in with Bluesky</button></form><div class=\"divider text-xs\">or via the ATmosphere</div><form class=\"join w-full\" action=\"/auth/login\" method=\"post\"><input type=\"text\" class=\"input input-sm join-item flex-1\" name=\"username\" placeholder=\"@alice.example.com\"> <button class=\"btn btn-primary btn-sm join-item\" type=\"submit\">Go</button></form></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"space-y-3\"><form action=\"/auth/login\" method=\"get\"><button class=\"btn btn-primary w-full gap-2\"><i class=\"ri-bluesky-fill\"></i> Log in with Bluesky</button></form><div class=\"divider text-xs\">or via the ATmosphere</div><form class=\"join w-full\" action=\"/auth/login\" method=\"post\"><input type=\"text\" class=\"input input-sm join-item flex-1\" name=\"username\" placeholder=\"@alice.example.com\"> <button class=\"btn btn-primary btn-sm join-item\" type=\"submit\">Go</button></form></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

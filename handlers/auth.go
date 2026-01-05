@@ -19,10 +19,10 @@ func (s *Server) OAuthLogin(w http.ResponseWriter, r *http.Request) {
 	os.Stdout.WriteString("DIRECT: Handler called\n")
 	slog.Info("login hello")
 
-	// TODO: forward requests without username to bsky login site
-
 	if r.Method != "POST" {
-		// TODO: thing
+		bskyAuth, _ := s.OAuth.StartAuthFlow(ctx, "https://bsky.social")
+		slog.Info("goin to bsky", "at", bskyAuth)
+		http.Redirect(w, r, bskyAuth, http.StatusFound)
 		return
 	}
 

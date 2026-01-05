@@ -58,7 +58,7 @@ templ Panel(authenticated bool, user models.Session) {
             </div>
         } else {
             <div class="space-y-3">
-                <form action="/auth/login" method="post">
+                <form action="/auth/login" method="get">
                     <button class="btn btn-primary w-full gap-2">
                         <i class="ri-bluesky-fill"></i>
                         Log in with Bluesky
