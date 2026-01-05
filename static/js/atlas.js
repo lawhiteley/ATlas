@@ -21,7 +21,7 @@ const popup = new maplibregl.Popup({
 });
 
 map.on('click', (e) => {
-    if (Alpine.store('savedPin').hasPin) return;
+    if (Alpine.store('savedPin').hasPin || !document.cookie.includes(`oauth-session=`)) return;
     const coords = e.lngLat;
     
     const popupContent = document.createElement('div');

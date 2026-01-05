@@ -122,6 +122,8 @@ func (s *Server) OAuthLogout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	http.SetCookie(w, &http.Cookie{Name: "oauth-session", Value: "", Path: "/", MaxAge: -1})
+
 	slog.Info("logged out", "did", session.DID)
 	http.Redirect(w, r, "/", http.StatusFound)
 }
