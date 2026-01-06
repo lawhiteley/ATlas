@@ -1,6 +1,6 @@
 {
     "lexicon": 1,
-    "id": "io.whiteley.luke.ATlas.pin",
+    "id": "io.whiteley.ATlas.pin",
     "defs": {
         "main": {
             "type": "record",

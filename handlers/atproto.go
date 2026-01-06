@@ -19,10 +19,10 @@ func (s *Server) PutPinRecord(session models.Session, pin models.Pin) string {
 	at := client.APIClient()
 
 	pinRecord := &atproto.RepoPutRecord_Input{
-		Collection: "io.whiteley.luke.ATlas.pin",
+		Collection: "io.whiteley.ATlas.pin",
 		Repo:       session.DID.String(),
 		Rkey:       "self",
-		Record: &util.LexiconTypeDecoder{Val: &models.ATlasPin{
+		Record: &util.LexiconTypeDecoder{Val: &models.AtlasPinRecord{
 			Did:         session.DID.String(),
 			PlacedAt:    time.Now().UTC().Format(time.RFC3339),
 			Longitude:   strconv.FormatFloat(pin.Latitude, 'f', -1, 64),
@@ -54,7 +54,7 @@ func (s *Server) DeletePinRecord(session models.Session) {
 	at := client.APIClient()
 
 	record := map[string]any{
-		"collection": "io.whiteley.luke.ATlas.pin",
+		"collection": "io.whiteley.ATlas.pin",
 		"repo":       session.DID.String(),
 		"rkey":       "self",
 	}
