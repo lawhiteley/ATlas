@@ -35,7 +35,7 @@ templ Panel(authenticated bool, user models.Session) {
             <div class="divider"></div>
 
             <div x-data x-show="$store.savedPin.hasPin" class="pin-info">
-                <legend class="fieldset-legend">My Pin</legend>        
+                <legend class="fieldset-legend">My Pin</legend>    
                 <div class="mt-2 text-sm" x-text="$store.savedPin.data.Description"></div>
                 
                 <div class="mt-3 flex items-center justify-between">
@@ -50,6 +50,12 @@ templ Panel(authenticated bool, user models.Session) {
                             class="text-red-400 hover:text-red-700 text-sm">
                         <i class="ri-delete-bin-line"></i> Remove
                     </button>
+                </div>
+
+                <div class="divider">
+                <a class="mt-2 text-xs"
+                    x-bind:href="'https://atproto-browser.vercel.app/' + $store.savedPin.data.Uri.replace('://', '/')"
+                    target="_blank">View pin on Atproto Browser</a>
                 </div>
             </div>
 

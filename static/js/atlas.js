@@ -2,10 +2,10 @@ const pinsElement = document.getElementById('pins');
 const pinsData = JSON.parse(pinsElement.dataset.pins);
 const { Longitude: long = 13, Latitude: lat = 42 } = window.savedPin || {};
 const map = new maplibregl.Map({
-container: 'map',
-style: 'https://tiles.basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-center: [long, lat],
-zoom: 3.3
+    container: 'map',
+    style: 'https://tiles.basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+    center: [long, lat],
+    zoom: 3.3
 });
 
 map.on('style.load', () => {

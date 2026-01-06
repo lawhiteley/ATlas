@@ -43,7 +43,9 @@ func (s *Server) NewPin(w http.ResponseWriter, r *http.Request) {
 		Avatar:      session.Avatar,
 	}
 
-	s.PutPinRecord(session, *pin)
+	uri := s.PutPinRecord(session, *pin)
+	pin.Uri = uri
+
 	s.Repository.SavePin(r.Context(), *pin)
 
 	w.Header().Set("Content-Type", "application/json")

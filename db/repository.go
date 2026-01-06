@@ -45,6 +45,7 @@ type storedAuthRequest struct {
 
 type storedPin struct {
 	Did         string `gorm:"primaryKey"`
+	Uri         string
 	Longitude   float64
 	Latitude    float64
 	Name        string
@@ -107,6 +108,7 @@ func (m *SQLiteStore) SavePin(ctx context.Context, pin models.Pin) error {
 		UpdateAll: true,
 	}).Create(&storedPin{
 		Did:         pin.Did,
+		Uri:         pin.Uri,
 		Longitude:   pin.Longitude,
 		Latitude:    pin.Latitude,
 		Name:        pin.Name,
@@ -194,6 +196,7 @@ func (m *SQLiteStore) DeleteAuthRequestInfo(ctx context.Context, state string) e
 func (sp storedPin) toPin() models.Pin {
 	return models.Pin{
 		Did:         sp.Did,
+		Uri:         sp.Uri,
 		Longitude:   sp.Longitude,
 		Latitude:    sp.Latitude,
 		Name:        sp.Name,

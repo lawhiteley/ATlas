@@ -12,7 +12,7 @@ import (
 	"github.com/bluesky-social/indigo/lex/util"
 )
 
-func (s *Server) PutPinRecord(session models.Session, pin models.Pin) {
+func (s *Server) PutPinRecord(session models.Session, pin models.Pin) string {
 	// TODO: refactor err handling etc..
 
 	client, _ := s.OAuth.ResumeSession(context.Background(), *session.DID, session.SessionID)
@@ -43,6 +43,7 @@ func (s *Server) PutPinRecord(session models.Session, pin models.Pin) {
 	}
 	slog.Info("atproto good", "resp", response)
 
+	return response.Uri.String()
 }
 
 func (s *Server) DeletePinRecord(session models.Session) {
