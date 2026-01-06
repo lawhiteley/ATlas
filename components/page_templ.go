@@ -31,7 +31,7 @@ func Page(atlas templ.Component, panel templ.Component, pin *models.Pin) templ.C
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html><head><title>ATlas</title><script src=\"https://unpkg.com/htmx.org@2\"></script><script src=\"https://unpkg.com/alpinejs@3\" defer></script><script src=\"https://unpkg.com/maplibre-gl@^5.14.0/dist/maplibre-gl.js\"></script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html data-theme=\"business\"><head><title>ATlas</title><script src=\"https://unpkg.com/htmx.org@2\"></script><script src=\"https://unpkg.com/alpinejs@3\" defer></script><script src=\"https://unpkg.com/maplibre-gl@^5.14.0/dist/maplibre-gl.js\"></script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

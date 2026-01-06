@@ -5,7 +5,7 @@ const map = new maplibregl.Map({
     container: 'map',
     style: 'https://tiles.basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
     center: [long, lat],
-    zoom: 3.3
+    zoom: 3.3,
 });
 
 map.on('style.load', () => {
@@ -122,7 +122,7 @@ function createMarkerForPin(pin) {
                     <div class="text-sm text-base-content/60 truncate">${pin.Handle}</div>
                 </div>
                 ${pin.Description ? `<p>${pin.Description}</p>` : ''}
-                ${pin.Website ? `<a class="link link-primary">${pin.Website}</a>` : ''}
+                ${pin.Website ? `<a class="link link-accent">${pin.Website}</a>` : ''}
             </div>
         </div>
     `;

@@ -91,7 +91,7 @@ func (s *Server) OAuthCallback(w http.ResponseWriter, r *http.Request) {
 	if getProfile.Avatar != "" {
 		cookie.Values["avatar"] = getProfile.Avatar
 	} else {
-		cookie.Values["avatar"] = "/static/img/default_avatar.jpg"
+		cookie.Values["avatar"] = "/static/img/default_avatar.png"
 	}
 
 	cookie.Values["session_id"] = data.SessionID
