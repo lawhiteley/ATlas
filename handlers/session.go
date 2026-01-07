@@ -34,3 +34,22 @@ func (s *Server) getDID(r *http.Request) models.Session {
 		Name:      name,
 	}
 }
+
+func (s *Server) setFlash(w http.ResponseWriter, r *http.Request, message string) {
+	session, _ := s.CookieStore.Get(r, "oauth-session")
+
+	session.AddFlash(message)
+	session.Save(r, w)
+}
+
+func (s *Server) getFlash(w http.ResponseWriter, r *http.Request) (string, bool) {
+	session, _ := s.CookieStore.Get(r, "oauth-session")
+
+	flashes := session.Flashes()
+	session.Save(r, w)
+
+	if len(flashes) > 0 {
+		return flashes[0].(string), true
+	}
+	return "", false
+}

@@ -205,8 +205,3 @@ function showFlash(message) {
         flashMessage.style.display = 'none';
     }, 5000);
 }
-
-function closeFlash() {
-    const flashMessage = document.getElementById('flash-message');
-    flashMessage.style.display = 'none';
-}

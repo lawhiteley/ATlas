@@ -138,7 +138,7 @@ func (s *Server) OAuthLogout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) ClientMetadata(w http.ResponseWriter, r *http.Request) {
-	slog.Info("client metadata request", "url", r.URL, "host", r.Host)
+	slog.Info("Client Metadata request", "url", r.URL, "host", r.Host)
 
 	meta := s.OAuth.Config.ClientMetadata()
 	if s.OAuth.Config.IsConfidential() {
@@ -148,14 +148,14 @@ func (s *Server) ClientMetadata(w http.ResponseWriter, r *http.Request) {
 	meta.ClientURI = strPtr(fmt.Sprintf("https://%s", r.Host))
 
 	if err := meta.Validate(s.OAuth.Config.ClientID); err != nil {
-		slog.Error("validating client metadata", "err", err)
-		renderDefaultGlobe(r.Context(), w, s.getDID(r), nil, err.Error())
+		slog.Error("Failed when validating client metadata", "err", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(meta); err != nil {
-		renderDefaultGlobe(r.Context(), w, s.getDID(r), nil, err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
@@ -164,7 +164,7 @@ func (s *Server) JWKS(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	body := s.OAuth.Config.PublicJWKS()
 	if err := json.NewEncoder(w).Encode(body); err != nil {
-		renderDefaultGlobe(r.Context(), w, s.getDID(r), nil, err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
