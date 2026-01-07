@@ -80,7 +80,7 @@ func initializeServer(cctx context.Context, cmd *cli.Command) error {
 	scope := []string{
 		"atproto",
 		"rpc:app.bsky.actor.getProfile?aud=did:web:api.bsky.app%23bsky_appview",
-		"transition:generic",
+		"repo:io.whiteley.ATlas.pin",
 	}
 
 	if hostname == "" {
