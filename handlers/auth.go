@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/bluesky-social/indigo/atproto/auth/oauth"
@@ -14,31 +13,36 @@ import (
 	"github.com/gorilla/sessions"
 )
 
+type Server struct {
+	Repository  *db.SQLiteStore
+	CookieStore *sessions.CookieStore
+	Dir         identity.Directory
+	OAuth       *oauth.ClientApp
+}
+
 func (s *Server) OAuthLogin(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	os.Stdout.WriteString("DIRECT: Handler called\n")
-	slog.Info("login hello")
 
 	if r.Method != "POST" {
 		bskyAuth, _ := s.OAuth.StartAuthFlow(ctx, "https://bsky.social")
-		slog.Info("goin to bsky", "at", bskyAuth)
 		http.Redirect(w, r, bskyAuth, http.StatusFound)
 		return
 	}
 
 	if err := r.ParseForm(); err != nil {
-		http.Error(w, fmt.Errorf("failed to parse form: %w", err).Error(), http.StatusBadRequest)
+		http.Error(w, fmt.Errorf("Failed to parse form: %w", err).Error(), http.StatusBadRequest)
 		return
 	}
 
 	username, _ := strings.CutPrefix(r.PostFormValue("username"), "@")
-	slog.Info("login", "client_id", s.OAuth.Config.ClientID, "callback_url", s.OAuth.Config.CallbackURL)
+	slog.Info("Auth flow started for client", "clientID", s.OAuth.Config.ClientID, "callbackURL", s.OAuth.Config)
 
 	redirectURL, err := s.OAuth.StartAuthFlow(ctx, username)
 
 	if err != nil {
 		var oauthErr = fmt.Errorf("OAuth failure: %w", err).Error()
 		slog.Error(oauthErr)
+		renderDefaultGlobe(r.Context(), w, s.getDID(r), nil, oauthErr)
 		return
 	}
 
@@ -47,45 +51,48 @@ func (s *Server) OAuthLogin(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) OAuthCallback(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	params := r.URL.Query()
-	slog.Info("callback", "params", params)
 
 	data, err := s.OAuth.ProcessCallback(ctx, r.URL.Query())
 	if err != nil {
-		var callbackErr = fmt.Errorf("failed to process callback: %w", err).Error()
+		var callbackErr = fmt.Errorf("Failed to process OAuth callback: %w", err).Error()
 		slog.Error(callbackErr)
+		renderDefaultGlobe(r.Context(), w, s.getDID(r), nil, callbackErr)
+
 		return
 	}
 
 	session, err := s.OAuth.ResumeSession(ctx, data.AccountDID, data.SessionID)
 	if err != nil {
-		http.Error(w, "not authenticated", http.StatusUnauthorized)
+		slog.Error("Unauthenticated", "DID", data.AccountDID)
+		renderDefaultGlobe(r.Context(), w, s.getDID(r), nil, "Unauthenticated")
+
 		return
 	}
-	c := session.APIClient()
 
+	c := session.APIClient()
 	var getSession struct {
 		Handle string `json:"handle"`
 	}
 	if err := c.Get(ctx, "com.atproto.server.getSession", nil, &getSession); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		renderDefaultGlobe(r.Context(), w, s.getDID(r), nil, err.Error())
 		return
 	}
+
+	userDID := data.AccountDID.String()
 
 	var getProfile struct {
 		Avatar      string `json:"avatar"`
 		DisplayName string `json:"displayName"`
 	}
-	profile := map[string]any{"actor": data.AccountDID.String()}
+	profile := map[string]any{"actor": userDID}
 	if err := c.Get(ctx, "app.bsky.actor.getProfile", profile, &getProfile); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		slog.Error("Failed to get profile for user", "DID", userDID)
+		renderDefaultGlobe(r.Context(), w, s.getDID(r), nil, err.Error())
 		return
 	}
 
-	slog.Info("result", "profile", getProfile)
-
 	cookie, _ := s.CookieStore.Get(r, "oauth-session")
-	cookie.Values["account_did"] = data.AccountDID.String()
+	cookie.Values["account_did"] = userDID
 	cookie.Values["display_name"] = getProfile.DisplayName
 
 	if getProfile.Avatar != "" {
@@ -97,19 +104,21 @@ func (s *Server) OAuthCallback(w http.ResponseWriter, r *http.Request) {
 	cookie.Values["session_id"] = data.SessionID
 	cookie.Values["handle"] = getSession.Handle
 	if err := cookie.Save(r, w); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		slog.Error("Failed to save cookie for user", "DID", userDID)
+		renderDefaultGlobe(r.Context(), w, s.getDID(r), nil, err.Error())
 		return
 	}
 
-	slog.Info("login success", "did", data.AccountDID.String())
+	slog.Info("Successful login", "did", userDID)
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func (s *Server) OAuthLogout(w http.ResponseWriter, r *http.Request) {
 	session := s.getDID(r)
+
 	if session.DID != nil {
 		if err := s.OAuth.Logout(r.Context(), *session.DID, session.SessionID); err != nil {
-			slog.Error("logout failed", "did", session.DID, "err", err)
+			slog.Error("Logout failed", "did", session.DID, "err", err)
 		}
 	}
 
@@ -117,13 +126,14 @@ func (s *Server) OAuthLogout(w http.ResponseWriter, r *http.Request) {
 	sess.Values = make(map[any]any)
 	err := sess.Save(r, w)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		slog.Error("Failed to delete session", "did", session.DID, "err", err)
+		renderDefaultGlobe(r.Context(), w, s.getDID(r), nil, err.Error())
 		return
 	}
 
 	http.SetCookie(w, &http.Cookie{Name: "oauth-session", Value: "", Path: "/", MaxAge: -1})
 
-	slog.Info("logged out", "did", session.DID)
+	slog.Info("Successful logout", "did", session.DID)
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
@@ -137,37 +147,28 @@ func (s *Server) ClientMetadata(w http.ResponseWriter, r *http.Request) {
 	meta.ClientName = strPtr("ATlas")
 	meta.ClientURI = strPtr(fmt.Sprintf("https://%s", r.Host))
 
-	// internal consistency check
 	if err := meta.Validate(s.OAuth.Config.ClientID); err != nil {
 		slog.Error("validating client metadata", "err", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		renderDefaultGlobe(r.Context(), w, s.getDID(r), nil, err.Error())
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(meta); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		renderDefaultGlobe(r.Context(), w, s.getDID(r), nil, err.Error())
 		return
 	}
-}
-
-// TODO: move?
-func strPtr(raw string) *string {
-	return &raw
 }
 
 func (s *Server) JWKS(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	body := s.OAuth.Config.PublicJWKS()
 	if err := json.NewEncoder(w).Encode(body); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		renderDefaultGlobe(r.Context(), w, s.getDID(r), nil, err.Error())
 		return
 	}
 }
 
-type Server struct {
-	Repository  *db.SQLiteStore
-	CookieStore *sessions.CookieStore
-	Dir         identity.Directory
-	OAuth       *oauth.ClientApp
+func strPtr(raw string) *string {
+	return &raw
 }

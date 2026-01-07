@@ -2,7 +2,7 @@ package components
 
 import "ATlas/models"
 
-templ Page(atlas templ.Component, panel templ.Component, pin *models.Pin) {
+templ Page(atlas templ.Component, panel templ.Component, pin *models.Pin, flash string) {
     <!DOCTYPE html>
     <html data-theme="business">
     <head>
@@ -25,6 +25,13 @@ templ Page(atlas templ.Component, panel templ.Component, pin *models.Pin) {
             <button onclick="closeFlash()" class="btn btn-sm btn-error">Dismiss</button>
         </div>
     </div>
+    if flash != "" {
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                showFlash({{flash}});
+            });
+        </script>
+    }
     @panel
     @atlas
     </body>

@@ -20,26 +20,26 @@ func (s *Server) Globe(w http.ResponseWriter, r *http.Request) {
 	didMap := ToDidMap(pins)
 
 	if session.DID == nil {
-		renderDefaultGlobe(ctx, w, session, didMap)
+		renderDefaultGlobe(ctx, w, session, didMap, "")
 		return
 	}
 
 	_, err := s.OAuth.ResumeSession(ctx, *session.DID, session.SessionID)
 	if err != nil {
 		slog.Warn("Session resume failed for user", "DID", session.DID, "sessionID", session.SessionID)
-		renderDefaultGlobe(ctx, w, session, didMap)
+		renderDefaultGlobe(ctx, w, session, didMap, "")
 		return
 	}
 
 	slog.Info("Globe loaded for user", "DID", session.DID, "handle", session.Handle, "name", session.Name)
 	userDid := session.DID.String()
 	userPin := didMap[userDid]
-	v := components.Page(components.Atlas(userDid, didMap), components.Panel(true, session), &userPin)
+	v := components.Page(components.Atlas(userDid, didMap), components.Panel(true, session), &userPin, "")
 	v.Render(ctx, w)
 }
 
-func renderDefaultGlobe(ctx context.Context, w http.ResponseWriter, session models.Session, didMap map[string]models.Pin) {
-	v := components.Page(components.Atlas("", didMap), components.Panel(false, session), nil)
+func renderDefaultGlobe(ctx context.Context, w http.ResponseWriter, session models.Session, didMap map[string]models.Pin, flash string) {
+	v := components.Page(components.Atlas("", didMap), components.Panel(false, session), nil, flash)
 	v.Render(ctx, w)
 }
 
