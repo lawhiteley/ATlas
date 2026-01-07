@@ -3,6 +3,7 @@ module ATlas
 go 1.25.5
 
 require (
+	github.com/MicahParks/jwkset v0.11.0
 	github.com/a-h/templ v0.3.960
 	github.com/bluesky-social/indigo v0.0.0-20251223190123-598fbf0e146e
 	github.com/go-playground/validator/v10 v10.30.1
@@ -67,7 +68,7 @@ require (
 	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.39.0 // indirect
 	golang.org/x/text v0.32.0 // indirect
-	golang.org/x/time v0.3.0 // indirect
+	golang.org/x/time v0.9.0 // indirect
 	golang.org/x/tools v0.39.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	lukechampine.com/blake3 v1.2.1 // indirect
