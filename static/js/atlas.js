@@ -63,7 +63,7 @@ map.on('click', (e) => {
 
 async function addPin(coords, description, website) {
     try {
-        const response = await fetch('/pin', {
+        const request = await fetch('/pin', {
             method: "POST",
             headers: { 'Content-Type': 'application/x-www-form-urlencoded'},
             body: new URLSearchParams({
@@ -74,13 +74,19 @@ async function addPin(coords, description, website) {
             })
         });
 
-        const pin = await response.json();
-        pinsData[pin.Did] = pin; // TODO: remove this?
-        Alpine.store('savedPin').data = pin;
+        const response = await request.json();
 
-        createMarkerForPin(pin);
+        if (response.error) {
+            showFlash(response.error)
+        } else {
+            pin = response.pinData;
+            pinsData[pin.Did] = pin;
+            Alpine.store('savedPin').data = pin;
 
-        return pin;
+            createMarkerForPin(pin);
+
+            return pin;
+        }
     } catch (error) {
         console.error(`Failed to add pin: ${error}`)
     }
@@ -187,3 +193,20 @@ document.addEventListener('alpine:init', () => {
         }
     });
 });
+
+function showFlash(message) {
+    const flashMessage = document.getElementById('flash-message');
+    const errorMessage = document.getElementById('error-message');
+
+    errorMessage.textContent = message;
+    flashMessage.style.display = 'block';
+
+    setTimeout(() => {
+        flashMessage.style.display = 'none';
+    }, 5000);
+}
+
+function closeFlash() {
+    const flashMessage = document.getElementById('flash-message');
+    flashMessage.style.display = 'none';
+}

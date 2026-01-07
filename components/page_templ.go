@@ -53,7 +53,7 @@ func Page(atlas templ.Component, panel templ.Component, pin *models.Pin) templ.C
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<link href=\" https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.min.css \" rel=\"stylesheet\"><link href=\"https://unpkg.com/maplibre-gl@^5.14.0/dist/maplibre-gl.css\" rel=\"stylesheet\"><link href=\"/static/css/output.css\" type=\"text/css\" rel=\"stylesheet\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/static/img/favicon.svg\"></head><body>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<link href=\" https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.min.css \" rel=\"stylesheet\"><link href=\"https://unpkg.com/maplibre-gl@^5.14.0/dist/maplibre-gl.css\" rel=\"stylesheet\"><link href=\"/static/css/output.css\" type=\"text/css\" rel=\"stylesheet\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/static/img/favicon.svg\"></head><body><div id=\"flash-message\" class=\"fixed top-4 right-4 z-50 w-auto max-w-xs\" style=\"display: none;\"><div class=\"alert alert-error bg-red-500 text-white rounded-lg shadow-md p-4\"><span id=\"error-message\"></span> <button onclick=\"closeFlash()\" class=\"btn btn-sm btn-error\">Dismiss</button></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

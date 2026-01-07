@@ -13,8 +13,6 @@ import (
 )
 
 func (s *Server) PutPinRecord(session models.Session, pin models.Pin) string {
-	// TODO: refactor err handling etc..
-
 	client, _ := s.OAuth.ResumeSession(context.Background(), *session.DID, session.SessionID)
 	at := client.APIClient()
 
@@ -32,24 +30,24 @@ func (s *Server) PutPinRecord(session models.Session, pin models.Pin) string {
 		}},
 	}
 
-	slog.Info("atproto prepped", "record", pinRecord)
-	var response struct { // TODO: persist and surface this
+	slog.Debug("Atproto createRecord payload", "record", pinRecord)
+
+	var response struct {
 		Uri syntax.ATURI `json:"uri"`
 	}
 
 	if err := at.Post(context.Background(), "com.atproto.repo.createRecord", pinRecord, &response); err != nil {
-		slog.Info("atproto bad", "err", err)
+		slog.Error("PutRecord request failed", "err", err)
 
 	}
-	slog.Info("atproto good", "resp", response)
 
-	return response.Uri.String()
+	pinURI := response.Uri.String()
+	slog.Info("Atproto createRecord request successful", "pinURI", pinURI)
+
+	return pinURI
 }
 
 func (s *Server) DeletePinRecord(session models.Session) {
-	// TODO: refactor err handling etc..
-	// TODO: check DID equality?
-
 	client, _ := s.OAuth.ResumeSession(context.Background(), *session.DID, session.SessionID)
 	at := client.APIClient()
 
@@ -59,13 +57,11 @@ func (s *Server) DeletePinRecord(session models.Session) {
 		"rkey":       "self",
 	}
 
-	slog.Info("atproto prepped", "record", record)
+	slog.Debug("Atproto deleteRecord payload", "record", record)
 
 	if err := at.Post(context.Background(), "com.atproto.repo.deleteRecord", record, nil); err != nil {
-		slog.Info("atproto bad", "err", err)
-
+		slog.Error("Atproto createRecord request failed", "err", err)
 	}
 
-	slog.Info("atproto good")
-
+	slog.Info("Atproto createRecord request successful", "DID", session.DID.String())
 }
