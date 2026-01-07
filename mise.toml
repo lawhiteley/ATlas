@@ -7,7 +7,7 @@ deps = "bun install && go get ."
 
 build-css = "bunx tailwindcss -c tailwind.config.js -i ./assets/input.css -o ./static/css/output.css --minify --watch"
 
-build-templ = "go tool templ generate --watch --proxy='http://localhost:3000' --cmd='go run .'"
+build-templ = "go tool templ generate --watch --proxy='http://localhost:8080' --cmd='go run .'"
 
 run = "go run . 2>&1 | tee -a app.log"
 

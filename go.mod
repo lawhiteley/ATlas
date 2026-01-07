@@ -3,7 +3,6 @@ module ATlas
 go 1.25.5
 
 require (
-	github.com/MicahParks/jwkset v0.11.0
 	github.com/a-h/templ v0.3.960
 	github.com/bluesky-social/indigo v0.0.0-20251223190123-598fbf0e146e
 	github.com/go-playground/validator/v10 v10.30.1

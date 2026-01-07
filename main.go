@@ -42,22 +42,16 @@ func main() {
 				Sources: cli.EnvVars("CLIENT_SECRET_KEY"),
 			},
 			&cli.StringFlag{
-				Name:    "client-secret-key-id",
-				Usage:   "Key ID for $CLIENT_SECRET_KEY",
-				Value:   "primary",
-				Sources: cli.EnvVars("CLIENT_SECRET_KEY_ID"),
-			},
-			&cli.StringFlag{
 				Name:    "log-level",
 				Usage:   "Log verbosity",
 				Value:   "debug",
 				Sources: cli.EnvVars("LOG_LEVEL"),
 			},
 			&cli.StringFlag{
-				Name:     "session-secret",
-				Usage:    "Key for cookie security",
-				Required: true,
-				Sources:  cli.EnvVars("SESSION_SECRET"),
+				Name:    "session-secret",
+				Usage:   "Key for cookie security",
+				Value:   "change-this-please",
+				Sources: cli.EnvVars("SESSION_SECRET"),
 			},
 		},
 	}
