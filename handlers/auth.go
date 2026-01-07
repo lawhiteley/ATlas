@@ -142,7 +142,7 @@ func (s *Server) ClientMetadata(w http.ResponseWriter, r *http.Request) {
 
 	meta := s.OAuth.Config.ClientMetadata()
 	if s.OAuth.Config.IsConfidential() {
-		meta.JWKSURI = strPtr(fmt.Sprintf("https://%s/oauth/jwks.json", r.Host))
+		meta.JWKSURI = strPtr(fmt.Sprintf("https://%s/auth/jwks.json", r.Host))
 	}
 	meta.ClientName = strPtr("ATlas")
 	meta.ClientURI = strPtr(fmt.Sprintf("https://%s", r.Host))
