@@ -5,8 +5,12 @@ go 1.25.5
 require (
 	github.com/a-h/templ v0.3.960
 	github.com/bluesky-social/indigo v0.0.0-20251223190123-598fbf0e146e
+	github.com/go-playground/validator/v10 v10.30.1
+	github.com/google/uuid v1.4.0
 	github.com/gorilla/sessions v1.4.0
 	github.com/ipfs/go-cid v0.4.1
+	github.com/joho/godotenv v1.5.1
+	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/urfave/cli/v3 v3.6.1
 	github.com/whyrusleeping/cbor-gen v0.2.1-0.20241030202151-b7a6831be65e
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028
@@ -28,19 +32,16 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.12 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.30.1 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.2 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
 	github.com/minio/sha256-simd v1.0.1 // indirect
 	github.com/mr-tron/base58 v1.2.0 // indirect

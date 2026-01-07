@@ -3,7 +3,7 @@ go = "1.25"
 bun = "1.3.4"
 
 [tasks]
-deps = "bun install"
+deps = "bun install && go get ."
 
 build-css = "bunx tailwindcss -c tailwind.config.js -i ./assets/input.css -o ./static/css/output.css --minify --watch"
 
