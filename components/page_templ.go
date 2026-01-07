@@ -53,7 +53,7 @@ func Page(atlas templ.Component, panel templ.Component, pin *models.Pin) templ.C
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<link href=\" https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.min.css \" rel=\"stylesheet\"><link href=\"https://unpkg.com/maplibre-gl@^5.14.0/dist/maplibre-gl.css\" rel=\"stylesheet\"><link href=\"/static/css/output.css\" type=\"text/css\" rel=\"stylesheet\"></head><body>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<link href=\" https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.min.css \" rel=\"stylesheet\"><link href=\"https://unpkg.com/maplibre-gl@^5.14.0/dist/maplibre-gl.css\" rel=\"stylesheet\"><link href=\"/static/css/output.css\" type=\"text/css\" rel=\"stylesheet\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/static/img/favicon.svg\"></head><body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
