@@ -42,7 +42,7 @@ func Page(atlas templ.Component, panel templ.Component, pin *models.Pin) templ.C
 			}
 			templ_7745c5c3_Var2, templ_7745c5c3_Err := templruntime.ScriptContentOutsideStringLiteral(pin)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/page.templ`, Line: 15, Col: 44}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/page.templ`, Line: 14, Col: 44}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2)
 			if templ_7745c5c3_Err != nil {

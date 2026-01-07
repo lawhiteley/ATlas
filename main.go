@@ -8,7 +8,10 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strings"
 	"time"
+
+	_ "github.com/joho/godotenv/autoload"
 
 	"github.com/bluesky-social/indigo/atproto/atcrypto"
 	"github.com/bluesky-social/indigo/atproto/auth/oauth"
@@ -44,6 +47,18 @@ func main() {
 				Value:   "primary",
 				Sources: cli.EnvVars("CLIENT_SECRET_KEY_ID"),
 			},
+			&cli.StringFlag{
+				Name:    "log-level",
+				Usage:   "Log verbosity",
+				Value:   "debug",
+				Sources: cli.EnvVars("LOG_LEVEL"),
+			},
+			&cli.StringFlag{
+				Name:     "session-secret",
+				Usage:    "Key for cookie security",
+				Required: true,
+				Sources:  cli.EnvVars("SESSION_SECRET"),
+			},
 		},
 	}
 
@@ -56,6 +71,9 @@ func main() {
 func initializeServer(cctx context.Context, cmd *cli.Command) error {
 	bind := cmd.String("bind")
 	mux := http.NewServeMux()
+
+	handler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: getLogLevel(cmd)})
+	slog.SetDefault(slog.New(handler))
 
 	var config oauth.ClientConfig
 	hostname := cmd.String("hostname")
@@ -87,8 +105,8 @@ func initializeServer(cctx context.Context, cmd *cli.Command) error {
 
 	store, _ := db.NewSQLiteStore(&db.SQLiteConfig{
 		Path:             "atlas_data.sqlite3",
-		SessionExpiry:    time.Hour * 24 * 90,
-		InactivityExpiry: time.Hour * 24 * 14,
+		SessionExpiry:    time.Hour * 24 * 5,
+		InactivityExpiry: time.Hour * 24 * 3,
 		RequestExpiry:    time.Minute * 30,
 	})
 
@@ -96,7 +114,7 @@ func initializeServer(cctx context.Context, cmd *cli.Command) error {
 
 	srv := handlers.Server{
 		Repository:  store,
-		CookieStore: sessions.NewCookieStore([]byte("dfklsdjfkjldfjklsdfjlf")), // TODO: cctx.String("session-secret") from CLI arg
+		CookieStore: sessions.NewCookieStore([]byte(cmd.String("session-secret"))),
 		Dir:         identity.DefaultDirectory(),
 		OAuth:       oauthClient,
 	}
@@ -131,4 +149,22 @@ func registerAuthRoutes(mux *http.ServeMux, s *handlers.Server) {
 	mux.HandleFunc("GET /auth/login", s.OAuthLogin)
 	mux.HandleFunc("POST /auth/login", s.OAuthLogin)
 	mux.HandleFunc("GET /auth/logout", s.OAuthLogout)
+}
+
+func getLogLevel(cmd *cli.Command) slog.Level {
+	logLevels := map[string]slog.Level{
+		"debug": slog.LevelDebug,
+		"info":  slog.LevelInfo,
+		"warn":  slog.LevelWarn,
+		"error": slog.LevelError,
+	}
+
+	levelFromEnv := cmd.String("LOG_LEVEL")
+
+	logLevel, ok := logLevels[strings.ToLower(levelFromEnv)]
+	if !ok {
+		logLevel = slog.LevelInfo
+	}
+
+	return logLevel
 }
