@@ -29,7 +29,7 @@ func main() {
 				Name:    "bind",
 				Aliases: []string{"b"},
 				Usage:   "Server bind address",
-				Value:   ":3000",
+				Value:   ":8080",
 			},
 			&cli.StringFlag{
 				Name:    "hostname",
