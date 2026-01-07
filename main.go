@@ -10,6 +10,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/bluesky-social/indigo/atproto/atcrypto"
 	"github.com/bluesky-social/indigo/atproto/auth/oauth"
 	"github.com/bluesky-social/indigo/atproto/identity"
 	"github.com/gorilla/sessions"
@@ -56,15 +57,33 @@ func initializeServer(cctx context.Context, cmd *cli.Command) error {
 	bind := cmd.String("bind")
 	mux := http.NewServeMux()
 
-	// TODO: add confidential client support for deploy
-	config := oauth.NewLocalhostConfig(
-		fmt.Sprintf("http://127.0.0.1%s/auth/callback", bind),
-		[]string{
-			"atproto",
-			"rpc:app.bsky.actor.getProfile?aud=did:web:api.bsky.app%23bsky_appview",
-			"transition:generic",
-		}, // TODO: extract
-	)
+	var config oauth.ClientConfig
+	hostname := cmd.String("hostname")
+	scope := []string{
+		"atproto",
+		"rpc:app.bsky.actor.getProfile?aud=did:web:api.bsky.app%23bsky_appview",
+		"transition:generic",
+	}
+
+	if hostname == "" {
+		config = oauth.NewLocalhostConfig(fmt.Sprintf("http://127.0.0.1%s/auth/callback", bind), scope)
+	} else {
+		config = oauth.NewPublicConfig(
+			fmt.Sprintf("https://%s/auth/client-metadata.json", hostname),
+			fmt.Sprintf("https://%s/auth/callback", hostname),
+			scope,
+		)
+	}
+
+	if hostname != "" && cmd.String("client-secret-key") != "" {
+		priv, err := atcrypto.ParsePrivateMultibase(cmd.String("client-secret-key"))
+		if err != nil {
+			return err
+		}
+		if err := config.SetClientSecret(priv, cmd.String("client-secret-key-id")); err != nil {
+			return err
+		}
+	}
 
 	store, _ := db.NewSQLiteStore(&db.SQLiteConfig{
 		Path:             "atlas_data.sqlite3",
@@ -103,8 +122,7 @@ func registerAppRoutes(mux *http.ServeMux, s *handlers.Server) {
 }
 
 func registerAuthRoutes(mux *http.ServeMux, s *handlers.Server) {
-
-	// Outward-facing auth
+	// Atproto-facing auth
 	mux.HandleFunc("GET /auth/jwks.json", s.JWKS)
 	mux.HandleFunc("GET /auth/client-metadata.json", s.ClientMetadata)
 	mux.HandleFunc("GET /auth/callback", s.OAuthCallback)
