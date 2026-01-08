@@ -27,9 +27,9 @@ mise build
 
 ## Deployment
 
-The service should run locally without any of the below due to the [development client](https://atproto.com/specs/oauth#localhost-client-development) exception for `localhost`. If you wish to deploy this however, you'll need to enable the [confidential client](https://atproto.com/specs/oauth#localhost-client-development) by setting the following values: 
+The service should run locally without any of the below due to the [development client](https://atproto.com/specs/oauth#localhost-client-development) exception for `localhost`. If you wish to deploy this however, you'll need to enable the [confidential client](https://atproto.com/specs/oauth#confidential-client-authentication) by setting the following values: 
 
 
 * `SESSION_SECRET`: Any ol' secret. Something like `openssl rand -hex 32`
 * `CLIENT_HOSTNAME`: Wherever the service is running (e.g. https://atlas.whiteley.io)
-* `CLIENT_SECRET_KEY`: EC private key in Multibase format. Can be generated with `goat key generate -t P-256`
+* `CLIENT_SECRET_KEY`: EC private key in multibase format. Can be generated with `goat key generate -t P-256`
