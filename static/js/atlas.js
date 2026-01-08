@@ -1,65 +1,70 @@
 const pinsElement = document.getElementById('pins');
 const pinsData = JSON.parse(pinsElement.dataset.pins);
 const { Longitude: long = 13, Latitude: lat = 42 } = window.savedPin || {};
-const map = new maplibregl.Map({
-    container: 'map',
-    style: 'https://tiles.basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-    center: [long, lat],
-    zoom: 3.3,
-});
 
-map.on('style.load', () => {
-    map.setProjection({
-        type: 'globe'
+try {
+    const map = new maplibregl.Map({
+        container: 'map',
+        style: 'https://tiles.basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+        center: [long, lat],
+        zoom: 3.3,
     });
-});
 
-const popup = new maplibregl.Popup({
-    closeButton: false,
-    closeOnClick: false,
-    maxWidth: '300px'
-});
+    map.on('style.load', () => {
+        map.setProjection({
+            type: 'globe'
+        });
+    });
 
-map.on('click', (e) => {
-    if (Alpine.store('savedPin').hasPin || !document.cookie.includes(`oauth-session=`)) return;
-    const coords = e.lngLat;
-    
-    const popupContent = document.createElement('div');
-    popupContent.className = 'card shadow-xl bg-base-200/90 backdrop-blur-sm border-base-300 rounded-box';
-    popupContent.innerHTML = `
-        <fieldset class="card-body p-3 m-2">
-            <div class="card-title flex justify-between items-center">
-            <legend class="fieldset-legend">Place your Pin</legend>
-                <button class="btn btn-sm btn-circle btn-ghost close-popup">
-                    <i class="ri-close-line text-lg"></i>
+    const popup = new maplibregl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        maxWidth: '300px'
+    });
+
+    map.on('click', (e) => {
+        if (Alpine.store('savedPin').hasPin || !document.cookie.includes(`oauth-session=`)) return;
+        const coords = e.lngLat;
+        
+        const popupContent = document.createElement('div');
+        popupContent.className = 'card shadow-xl bg-base-200/90 backdrop-blur-sm border-base-300 rounded-box';
+        popupContent.innerHTML = `
+            <fieldset class="card-body p-3 m-2">
+                <div class="card-title flex justify-between items-center">
+                <legend class="fieldset-legend">Place your Pin</legend>
+                    <button class="btn btn-sm btn-circle btn-ghost close-popup">
+                        <i class="ri-close-line text-lg"></i>
+                    </button>
+                </div>
+                <label class="label">Description</label>
+                <textarea placeholder="What are you doing here?" class="textarea textarea-s pin-description"></textarea>
+
+                <label class="label">Website</label>
+                <input type="text" class="input input-s pin-website" placeholder="https://luke.whiteley.io" />
+                <button class="btn btn-primary btn-sm place-pin-btn">
+                    <i class="ri-map-pin-line mr-2"></i> Place Pin
                 </button>
-            </div>
-            <label class="label">Description</label>
-            <textarea placeholder="What are you doing here?" class="textarea textarea-s pin-description"></textarea>
+            </fieldset>
+        `;
+        
+        popup.setDOMContent(popupContent);
+        popup.setLngLat(coords).addTo(map);
+        
+        popupContent.querySelector('.close-popup').addEventListener('click', () => {
+            popup.remove();
+        });
+        
+        popupContent.querySelector('.place-pin-btn').addEventListener('click', () => {
+            const description = popupContent.querySelector('.pin-description').value;
+            const website = popupContent.querySelector('.pin-website').value;
 
-            <label class="label">Website</label>
-            <input type="text" class="input input-s pin-website" placeholder="https://luke.whiteley.io" />
-            <button class="btn btn-primary btn-sm place-pin-btn">
-                <i class="ri-map-pin-line mr-2"></i> Place Pin
-            </button>
-        </fieldset>
-    `;
-    
-    popup.setDOMContent(popupContent);
-    popup.setLngLat(coords).addTo(map);
-    
-    popupContent.querySelector('.close-popup').addEventListener('click', () => {
-        popup.remove();
+            addPin(coords, description, website);
+            popup.remove();
+        });
     });
-    
-    popupContent.querySelector('.place-pin-btn').addEventListener('click', () => {
-        const description = popupContent.querySelector('.pin-description').value;
-        const website = popupContent.querySelector('.pin-website').value;
-
-        addPin(coords, description, website);
-        popup.remove();
-    });
-});
+} catch(error) {
+    showFlash(`Failed to load ATlas. Please check WebGL configuration`)
+}
 
 async function addPin(coords, description, website) {
     try {
