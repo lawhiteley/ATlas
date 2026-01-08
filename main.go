@@ -37,6 +37,12 @@ func main() {
 				Sources: cli.EnvVars("CLIENT_HOSTNAME"),
 			},
 			&cli.StringFlag{
+				Name:    "client-secret-key-id",
+				Usage:   "Key ID for $CLIENT_SECRET_KEY",
+				Value:   "primary",
+				Sources: cli.EnvVars("CLIENT_SECRET_KEY_ID"),
+			},
+			&cli.StringFlag{
 				Name:    "client-secret-key",
 				Usage:   "Key for confidential client. P-256 in multibase encoding",
 				Sources: cli.EnvVars("CLIENT_SECRET_KEY"),
