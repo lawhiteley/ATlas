@@ -132,7 +132,7 @@ function createMarkerForPin(pin) {
                     <div class="text-sm text-base-content/60 truncate">${pin.Handle}</div>
                 </div>
                 ${pin.Description ? `<p>${pin.Description}</p>` : ''}
-                ${pin.Website ? `<a class="link link-accent">${pin.Website}</a>` : ''}
+                ${pin.Website ? `<a class="link link-accent" target="_blank" href="${pin.Website}">${pin.Website}</a>` : ''}
             </div>
         </div>
     `;
