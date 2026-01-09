@@ -47,11 +47,16 @@ func (s *Server) NewPin(w http.ResponseWriter, r *http.Request) {
 			slog.Warn("Validation failed for pin", "err", err)
 			response.Error = fmt.Sprintf("Pin validation failed: %s", err)
 		} else {
-			uri := s.PutPinRecord(session, *pin)
-			pin.Uri = uri
+			uri, err := s.PutPinRecord(session, *pin)
 
-			s.Repository.SavePin(r.Context(), *pin)
-			response.PinData = pin
+			if err != nil {
+				response.Error = fmt.Sprintf("Failed to push pin to Atproto: %s", err)
+			} else {
+				pin.Uri = uri
+
+				s.Repository.SavePin(r.Context(), *pin)
+				response.PinData = pin
+			}
 		}
 
 		w.Header().Set("Content-Type", "application/json")

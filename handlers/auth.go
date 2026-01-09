@@ -109,6 +109,8 @@ func (s *Server) OAuthCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	s.SyncUserPin(userDID, c, getProfile.DisplayName, getSession.Handle, getProfile.Avatar)
+
 	slog.Info("Successful login", "did", userDID)
 	http.Redirect(w, r, "/", http.StatusFound)
 }
